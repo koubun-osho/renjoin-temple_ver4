@@ -1,6 +1,12 @@
 {
-  "buildCommand": "cd renjoin-temple && npm run build",
-  "installCommand": "cd renjoin-temple && npm install",
-  "outputDirectory": "renjoin-temple/.next",
-  "framework": "nextjs"
+  "version": 2,
+  "builds": [
+    {
+      "src": "renjoin-temple/package.json",
+      "use": "@vercel/next@latest",
+      "config": {
+        "rootDirectory": "renjoin-temple"
+      }
+    }
+  ]
 }
