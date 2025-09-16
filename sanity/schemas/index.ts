@@ -89,7 +89,7 @@ export function validateSchemas(): boolean {
   
   return schemaTypes.every(schema => {
     return requiredFields.every(field => {
-      return field in schema && schema[field] !== undefined
+      return field in schema && (schema as any)[field] !== undefined
     })
   })
 }
