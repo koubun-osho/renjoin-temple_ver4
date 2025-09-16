@@ -1,9 +1,3 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "renjoin-temple/package.json",
-      "use": "@vercel/next@latest"
-    }
-  ]
+  "rootDirectory": "renjoin-temple"
 }
