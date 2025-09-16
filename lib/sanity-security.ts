@@ -51,6 +51,48 @@ export const initializeSanitySecurity = () => {
 // ========================
 
 /**
+ * PortableText（リッチテキスト）のサニタイゼーション
+ * XSS攻撃を防ぐための処理
+ */
+export const sanitizePortableText = (content: unknown): unknown => {
+  if (!content || typeof content !== 'object') return content
+
+  if (Array.isArray(content)) {
+    return content.map(block => sanitizePortableText(block))
+  }
+
+  const block = content as Record<string, unknown>
+  const sanitized: Record<string, unknown> = {}
+
+  for (const [key, value] of Object.entries(block)) {
+    if (key === 'text' && typeof value === 'string') {
+      // テキストコンテンツのサニタイゼーション
+      sanitized[key] = sanitizeText(value)
+    } else if (key === 'marks' && Array.isArray(value)) {
+      // マークアップのサニタイゼーション（リンクなど）
+      sanitized[key] = value.map(mark => {
+        if (typeof mark === 'object' && mark !== null && 'href' in mark) {
+          const markObj = mark as Record<string, unknown>
+          return {
+            ...markObj,
+            href: typeof markObj.href === 'string' ?
+              sanitizeText(markObj.href).replace(/javascript:/gi, '') : ''
+          }
+        }
+        return mark
+      })
+    } else if (typeof value === 'object') {
+      // 再帰的にサニタイゼーション
+      sanitized[key] = sanitizePortableText(value)
+    } else {
+      sanitized[key] = value
+    }
+  }
+
+  return sanitized
+}
+
+/**
  * ブログ記事データのサニタイゼーション
  */
 export const sanitizeBlogPostData = (data: Record<string, unknown> | null) => {
@@ -60,6 +102,7 @@ export const sanitizeBlogPostData = (data: Record<string, unknown> | null) => {
     ...data,
     title: typeof data.title === 'string' ? sanitizeText(data.title) : '',
     excerpt: typeof data.excerpt === 'string' ? sanitizeText(data.excerpt) : undefined,
+    body: data.body ? sanitizePortableText(data.body) : undefined,
     slug: data.slug && typeof data.slug === 'object' && data.slug !== null && 'current' in data.slug && typeof (data.slug as { current?: string }).current === 'string' ? {
       ...data.slug,
       current: sanitizeSlug((data.slug as { current: string }).current)
@@ -76,6 +119,7 @@ export const sanitizeNewsData = (data: Record<string, unknown> | null) => {
   return {
     ...data,
     title: typeof data.title === 'string' ? sanitizeText(data.title) : '',
+    content: data.content ? sanitizePortableText(data.content) : undefined,
     slug: data.slug && typeof data.slug === 'object' && data.slug !== null && 'current' in data.slug && typeof (data.slug as { current?: string }).current === 'string' ? {
       ...data.slug,
       current: sanitizeSlug((data.slug as { current: string }).current)
@@ -93,6 +137,7 @@ export const sanitizePageData = (data: Record<string, unknown> | null) => {
     ...data,
     title: typeof data.title === 'string' ? sanitizeText(data.title) : '',
     metaDescription: typeof data.metaDescription === 'string' ? sanitizeText(data.metaDescription) : undefined,
+    body: data.body ? sanitizePortableText(data.body) : undefined,
     slug: data.slug && typeof data.slug === 'object' && data.slug !== null && 'current' in data.slug && typeof (data.slug as { current?: string }).current === 'string' ? {
       ...data.slug,
       current: sanitizeSlug((data.slug as { current: string }).current)

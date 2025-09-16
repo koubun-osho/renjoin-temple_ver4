@@ -16,13 +16,13 @@ export default defineConfig({
   title: '蓮城院 CMS｜コンテンツ管理システム',
   subtitle: '蓮城院公式サイトのコンテンツを管理します',
 
-  projectId: 'vbwerzmy',
-  dataset: 'production',
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
 
   // API設定とセキュリティ
   api: {
-    projectId: 'vbwerzmy',
-    dataset: 'production',
+    projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
+    dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
     // 本番環境ではCDNを使用
     useCdn: process.env.NODE_ENV === 'production',
     // APIバージョンを固定してセキュリティ向上

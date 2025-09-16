@@ -20,6 +20,7 @@ const eslintConfig = [
       "dist/**",
       "next-env.d.ts",
       "renjoin-temple/**",
+      "scripts/**",
     ],
   },
 ];
