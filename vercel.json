@@ -1,0 +1,6 @@
+{
+  "buildCommand": "cd renjoin-temple && npm run build",
+  "installCommand": "cd renjoin-temple && npm install",
+  "outputDirectory": "renjoin-temple/.next",
+  "framework": "nextjs"
+}
