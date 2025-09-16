@@ -1,311 +1,45 @@
-# ==============================================================================
-# 蓮城院公式サイト - セキュリティ強化版 .gitignore
-# ==============================================================================
-# SECURITY NOTE: このファイルは機密情報の漏洩を防ぐ重要なセキュリティ設定です
-# 変更時は必ずセキュリティエンジニアの承認を得てください
-# ==============================================================================
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# ==============================================================================
-# 🔒 CRITICAL SECURITY - 機密情報・認証関連
-# ==============================================================================
-# 環境変数ファイル（包括的保護）
-.env*
-*.env*
-.env.*
-env.*
-
-# SSL証明書・秘密鍵・認証ファイル
-*.key
-*.pem
-*.cert
-*.crt
-*.csr
-*.p12
-*.pfx
-*.keystore
-*.jks
-
-# API キー・トークン・認証情報
-*api-key*
-*secret*
-*token*
-*credential*
-*auth*
-credentials/
-secrets/
-.secrets/
-keys/
-
-# データベース関連
-*.db
-*.sqlite*
-*.sql
-database.json
-*.dump
-
-# セキュリティ監査・ログ
-security.log
-audit.log
-access.log
-error.log
-
-# ==============================================================================
-# 🏛️ TEMPLE SPECIFIC - 寺院特有の機密情報
-# ==============================================================================
-# 檀家情報・個人情報
-*danka*
-*personal*
-*member*
-*donation*
-*payment*
-
-# 寺院管理ファイル
-temple-admin/
-admin-config/
-priest-config/
-
-# ==============================================================================
-# ⚡ DEPLOYMENT & HOSTING - デプロイメント関連
-# ==============================================================================
-# Vercel
-.vercel
-.vercel/
-*.vercel
-vercel.json.backup
-
-# Netlify
-.netlify
-
-# その他のホスティング
-.firebase/
-.surge/
-.now/
-
-# ==============================================================================
-# 🚀 BUILD & DEVELOPMENT - ビルド・開発関連
-# ==============================================================================
-# Next.js
-.next/
-out/
-build/
-dist/
-*.tsbuildinfo
-next-env.d.ts.backup
-
-# TypeScript
-*.d.ts.map
-tsconfig.tsbuildinfo
-
-# Bundle analyzer
-.bundle-analyzer/
-bundle-stats.html
-
-# ==============================================================================
-# 📦 PACKAGE MANAGERS - パッケージマネージャー関連
-# ==============================================================================
-# Node.js
-node_modules/
-jspm_packages/
-.pnpm-store/
+# dependencies
+/node_modules
+/.pnp
 .pnp.*
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
-!.yarn/sdks
 !.yarn/versions
 
-# Package manager lockfiles (プロジェクトによって調整)
-package-lock.json.backup
-yarn.lock.backup
-pnpm-lock.yaml.backup
+# testing
+/coverage
 
-# NPM
-.npm/
-.npmrc.backup
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+.pnpm-debug.log*
 
-# ==============================================================================
-# 🧪 TESTING & COVERAGE - テスト・カバレッジ関連
-# ==============================================================================
-# Test coverage
-coverage/
-.nyc_output/
-*.lcov
-test-results/
-coverage.json
-.coverage/
+# env files (can opt-in for committing if needed)
+.env*
+!.env.local.example
 
-# Test outputs
-*.spec.js.snap
-*.test.js.snap
-__tests__/__snapshots__/
+# Sanity files
+/sanity/dist
 
-# ==============================================================================
-# 🔍 CMS & CONTENT - Sanity CMS関連
-# ==============================================================================
-# Sanity
-sanity/.env*
-sanity/dist/
-sanity/node_modules/
-sanity/.sanity/
-sanity/coverage/
-.sanity/
+# vercel
+.vercel
 
-# Content backups
-content-backup/
-cms-backup/
-
-# ==============================================================================
-# 💻 DEVELOPMENT TOOLS - 開発ツール関連
-# ==============================================================================
-# IDEs and editors
-.vscode/
-!.vscode/extensions.json
-!.vscode/settings.json.template
-.idea/
-*.sublime-*
-*.swp
-*.swo
-*~
-.vim/
-.netrwhist
-
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-.AppleDouble
-.LSOverride
-.TemporaryItems
-.VolumeIcon.icns
-.com.apple.timemachine.donotpresent
-.DocumentRevisions-V100
-.fseventsd
-.Spotlight-V100
-.TemporaryItems
-.Trashes
-.VolumeIcon.icns
-.com.apple.timemachine.donotpresent
-.AppleDB
-.AppleDesktop
-Network Trash Folder
-Temporary Items
-.apdisk
-
-# ==============================================================================
-# 📊 LOGS & MONITORING - ログ・モニタリング関連
-# ==============================================================================
-# Application logs
-logs/
-*.log
-log/
-temp-logs/
-
-# Performance monitoring
-.lighthouse/
-lighthouse-results/
-performance-reports/
-
-# Error tracking
-.sentry/
-error-reports/
-
-# ==============================================================================
-# 🔄 CACHE & TEMPORARY - キャッシュ・一時ファイル
-# ==============================================================================
-# Build caches
-.cache/
-.parcel-cache/
-.rpt2_cache/
-.rts2_cache_cjs/
-.rts2_cache_es/
-.rts2_cache_umd/
-.rollup.cache/
-.eslintcache
-.stylelintcache
-
-# Runtime data
-pids/
-*.pid
-*.seed
-*.pid.lock
-
-# Temporary directories
-tmp/
-temp/
-.tmp/
-.temp/
-
-# ==============================================================================
-# 💾 BACKUP & ARCHIVE - バックアップ・アーカイブ関連
-# ==============================================================================
-# Backup files
-*.backup
-*.bak
-*.old
-*.orig
-*.save
-*~backup~
-*.swp.backup
-.backup/
-backup/
-
-# Archive files
-*.zip.backup
-*.tar.gz.backup
-*.rar.backup
-
-# Version control backups
-*.patch
-*.diff
-
-# ==============================================================================
-# 🔧 CONFIGURATION - 設定ファイル関連
-# ==============================================================================
-# Runtime configurations
-.runtime/
-runtime-config/
-
-# Local configurations
-.local/
-local-config/
-.user-config/
-
-# ==============================================================================
-# 📱 MOBILE & NATIVE - モバイル・ネイティブアプリ関連
-# ==============================================================================
-# React Native
-ios/
-android/
-.expo/
-.expo-shared/
-
-# ==============================================================================
-# 🎨 ASSETS & MEDIA - アセット・メディア関連（開発用）
-# ==============================================================================
-# Large media files (development only)
-*.mov.dev
-*.mp4.dev
-*.avi.dev
-*.large.jpg
-*.large.png
-*.raw.*
-
-# Asset processing temp
-.asset-cache/
-processed-assets/
-
-# ==============================================================================
-# END OF SECURITY CONFIGURATION
-# ==============================================================================
-# このファイルの変更は必ずセキュリティエンジニアと相談してください
-# 機密情報の漏洩は寺院の信頼と檀家様の個人情報を危険にさらします
+# typescript
+*.tsbuildinfo
+next-env.d.ts
