@@ -36,6 +36,7 @@ yarn-error.log*
 
 # Sanity files
 /sanity/dist
+/dist
 
 # vercel
 .vercel

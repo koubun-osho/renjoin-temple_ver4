@@ -34,44 +34,40 @@ export const schemaTypes = [
 ]
 
 /**
- * スキーマ設定の概要
- * 
+ * スキーマ設定の概要（設計書.md準拠）
+ *
  * 【blog（ブログ記事）】
- * - タイトル、スラッグ、公開日、概要、著者、タグ、メイン画像、本文
- * - リッチテキストエディタ対応
- * - 画像の代替テキスト、キャプション設定可能
- * - SEO対応の概要文設定
- * 
+ * - タイトル（string, required）
+ * - スラッグ（slug, required, 自動生成）
+ * - 公開日（datetime, required）
+ * - 概要（text, 任意）
+ * - メイン画像（image with hotspot, 代替テキスト付き）
+ * - 本文（array of block and image）
+ *
  * 【news（お知らせ）】
- * - タイトル、スラッグ、公開日、カテゴリー、重要度、内容
- * - カテゴリー: 法要、イベント、お知らせ、その他
- * - 重要度: 高、中、低
- * - イベント日時・開催場所の条件付きフィールド
- * 
+ * - タイトル（string, required）
+ * - スラッグ（slug, required, 自動生成）
+ * - 公開日（datetime, required）
+ * - カテゴリー（string with options: event/notice/service）
+ * - 内容（array of block）
+ *
  * 【page（固定ページ）】
- * - タイトル、スラッグ、説明、表示順、本文
- * - ナビゲーション表示設定
- * - アクセス情報コンポーネント内蔵
- * - SEO設定項目完備
- * 
- * 【共通機能】
- * - 全スキーマでスラッグ自動生成
- * - バリデーション設定済み
- * - プレビュー表示カスタマイズ
- * - 並び順設定（公開日、タイトルなど）
- * - 日本語UI対応
- * 
+ * - タイトル（string, required）
+ * - スラッグ（slug, required, 自動生成）
+ * - 本文（array of block and image）
+ * - メタディスクリプション（text, 任意）
+ *
+ * 【実装方針】
+ * - 設計書.mdの仕様に厳密準拠
+ * - MVPスコープに限定した機能
+ * - セキュリティとパフォーマンスを最優先
+ * - 和モダンなコンテンツ編集体験
+ *
  * 【セキュリティ対策】
  * - URL形式バリデーション
  * - 文字数制限設定
  * - XSS対策を考慮したフィールド設計
- * 
- * 【拡張予定】
- * Phase 2以降で以下の機能追加を予定:
- * - カテゴリー・タグ管理
- * - メディアライブラリ拡張
- * - 多言語対応
- * - 高度なSEO設定
+ * - 最小権限の原則
  */
 
 // 型安全性のための型定義エクスポート（TypeScript用）
@@ -89,7 +85,7 @@ export function validateSchemas(): boolean {
   
   return schemaTypes.every(schema => {
     return requiredFields.every(field => {
-      return field in schema && (schema as any)[field] !== undefined
+      return field in schema && (schema as Record<string, unknown>)[field] !== undefined
     })
   })
 }

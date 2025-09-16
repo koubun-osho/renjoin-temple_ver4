@@ -38,31 +38,14 @@ export default defineType({
       description: 'お知らせのカテゴリーを選択してください',
       options: {
         list: [
-          { title: '法要', value: 'service' },
-          { title: 'イベント', value: 'event' },
+          { title: '行事案内', value: 'event' },
           { title: 'お知らせ', value: 'notice' },
-          { title: 'その他', value: 'other' }
+          { title: '法要', value: 'service' }
         ],
         layout: 'radio'
       },
       initialValue: 'notice',
       validation: (Rule) => Rule.required().error('カテゴリーは必須です')
-    }),
-    defineField({
-      name: 'priority',
-      title: '重要度',
-      type: 'string',
-      description: 'お知らせの重要度を選択してください',
-      options: {
-        list: [
-          { title: '高', value: 'high' },
-          { title: '中', value: 'medium' },
-          { title: '低', value: 'low' }
-        ],
-        layout: 'radio'
-      },
-      initialValue: 'medium',
-      validation: (Rule) => Rule.required().error('重要度は必須です')
     }),
     defineField({
       name: 'content',
@@ -111,102 +94,41 @@ export default defineType({
               }
             ]
           }
-        },
-        {
-          type: 'image',
-          options: {
-            hotspot: true,
-            metadata: ['blurhash', 'lqip']
-          },
-          fields: [
-            defineField({
-              name: 'alt',
-              title: '代替テキスト',
-              type: 'string',
-              description: '画像の代替テキスト',
-              validation: (Rule) => Rule.required().warning('代替テキストの設定を推奨します')
-            }),
-            defineField({
-              name: 'caption',
-              title: 'キャプション',
-              type: 'string',
-              description: '画像のキャプション（任意）'
-            })
-          ]
         }
       ],
       validation: (Rule) => Rule.required().error('内容は必須です')
-    }),
-    defineField({
-      name: 'eventDate',
-      title: 'イベント日時',
-      type: 'datetime',
-      description: 'イベント系のお知らせの場合、開催日時を設定してください',
-      hidden: ({ document }) => document?.category !== 'event'
-    }),
-    defineField({
-      name: 'eventLocation',
-      title: '開催場所',
-      type: 'string',
-      description: 'イベント系のお知らせの場合、開催場所を入力してください',
-      hidden: ({ document }) => document?.category !== 'event',
-      validation: (Rule) => Rule.custom((value, context) => {
-        const category = context.document?.category
-        if (category === 'event' && !value) {
-          return 'イベントの場合、開催場所は必須です'
-        }
-        return true
-      })
     })
   ],
   preview: {
     select: {
       title: 'title',
       category: 'category',
-      priority: 'priority',
       publishedAt: 'publishedAt'
     },
     prepare(selection) {
-      const { title, category, priority, publishedAt } = selection
-      
+      const { title, category, publishedAt } = selection
+
       // カテゴリーの日本語表示
       const categoryLabels: Record<string, string> = {
-        service: '法要',
-        event: 'イベント',
+        event: '行事案内',
         notice: 'お知らせ',
-        other: 'その他'
+        service: '法要'
       }
-      
-      // 重要度の絵文字
-      const priorityIcons: Record<string, string> = {
-        high: '🔴',
-        medium: '🟡',
-        low: '🟢'
-      }
-      
-      const formattedDate = publishedAt 
+
+      const formattedDate = publishedAt
         ? new Date(publishedAt).toLocaleDateString('ja-JP')
         : '未設定'
-      
+
       const categoryLabel = categoryLabels[category] || category || '未分類'
-      const priorityIcon = priorityIcons[priority] || '⚪'
-      
+
       return {
         title: title || '無題',
-        subtitle: `${priorityIcon} ${categoryLabel} - ${formattedDate}`,
+        subtitle: `${categoryLabel} - ${formattedDate}`,
         media: undefined
       }
     }
   },
   orderings: [
-    {
-      title: '重要度・公開日順',
-      name: 'priorityAndDate',
-      by: [
-        { field: 'priority', direction: 'asc' },
-        { field: 'publishedAt', direction: 'desc' }
-      ]
-    },
     {
       title: '公開日（新しい順）',
       name: 'publishedAtDesc',
@@ -224,33 +146,6 @@ export default defineType({
         { field: 'category', direction: 'asc' },
         { field: 'publishedAt', direction: 'desc' }
       ]
-    }
-  ],
-  groups: [
-    {
-      name: 'content',
-      title: 'コンテンツ',
-      default: true
-    },
-    {
-      name: 'settings',
-      title: '設定'
-    },
-    {
-      name: 'event',
-      title: 'イベント詳細'
-    }
-  ],
-  fieldsets: [
-    {
-      name: 'metadata',
-      title: 'メタデータ',
-      options: { collapsible: true, collapsed: false }
-    },
-    {
-      name: 'eventDetails',
-      title: 'イベント詳細',
-      options: { collapsible: true, collapsed: true }
     }
   ]
 })

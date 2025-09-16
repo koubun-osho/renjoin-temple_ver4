@@ -40,25 +40,6 @@ export default defineType({
       validation: (Rule) => Rule.max(200).warning('概要は200文字以内が推奨です')
     }),
     defineField({
-      name: 'author',
-      title: '著者名',
-      type: 'string',
-      description: '記事の著者名を入力してください',
-      initialValue: '副住職 荒木弘文',
-      validation: (Rule) => Rule.max(50).warning('著者名は50文字以内が推奨です')
-    }),
-    defineField({
-      name: 'tags',
-      title: 'タグ',
-      type: 'array',
-      description: '記事に関連するタグを追加してください',
-      of: [{ type: 'string' }],
-      options: {
-        layout: 'tags'
-      },
-      validation: (Rule) => Rule.max(10).warning('タグは10個以内が推奨です')
-    }),
-    defineField({
       name: 'mainImage',
       title: 'メイン画像',
       type: 'image',
@@ -155,19 +136,18 @@ export default defineType({
   preview: {
     select: {
       title: 'title',
-      author: 'author',
       media: 'mainImage',
       publishedAt: 'publishedAt'
     },
     prepare(selection) {
-      const { title, author, media, publishedAt } = selection
-      const formattedDate = publishedAt 
+      const { title, media, publishedAt } = selection
+      const formattedDate = publishedAt
         ? new Date(publishedAt).toLocaleDateString('ja-JP')
         : '未設定'
-      
+
       return {
         title: title || '無題',
-        subtitle: `${author || '著者未設定'} - ${formattedDate}`,
+        subtitle: `公開日: ${formattedDate}`,
         media
       }
     }
