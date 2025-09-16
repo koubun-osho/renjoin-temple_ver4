@@ -3,10 +3,7 @@
   "builds": [
     {
       "src": "renjoin-temple/package.json",
-      "use": "@vercel/next@latest",
-      "config": {
-        "rootDirectory": "renjoin-temple"
-      }
+      "use": "@vercel/next@latest"
     }
   ]
 }
