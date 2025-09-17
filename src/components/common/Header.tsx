@@ -45,7 +45,7 @@ const Header = () => {
   return (
     <header className="bg-white shadow-zen border-b border-neutral-200 relative z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 lg:h-20">
+        <div className="flex items-center justify-between h-14 sm:h-16 lg:h-20">
           {/* ロゴ・サイト名 */}
           <div className="flex-shrink-0">
             <Link
@@ -53,10 +53,10 @@ const Header = () => {
               className="flex items-center space-x-2 group"
               onClick={closeMobileMenu}
             >
-              <div className="text-2xl lg:text-3xl font-serif font-bold text-primary-700 group-hover:text-secondary-700 transition-colors duration-300">
+              <div className="text-xl sm:text-2xl lg:text-3xl font-serif font-bold text-primary-700 group-hover:text-secondary-700 transition-colors duration-300">
                 蓮城院
               </div>
-              <div className="hidden sm:block text-sm text-text-secondary font-sans">
+              <div className="hidden sm:block text-xs sm:text-sm text-text-secondary font-sans">
                 曹洞宗
               </div>
             </Link>
@@ -91,29 +91,29 @@ const Header = () => {
           <div className="lg:hidden">
             <button
               type="button"
-              className="inline-flex items-center justify-center p-2 rounded-md text-text-primary hover:text-secondary-700 hover:bg-neutral-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-secondary-700 transition-colors duration-300"
+              className="inline-flex items-center justify-center p-1.5 sm:p-2 rounded-md text-text-primary hover:text-secondary-700 hover:bg-neutral-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-secondary-700 transition-colors duration-300 touch-manipulation"
               aria-controls="mobile-menu"
               aria-expanded={isMobileMenuOpen}
               onClick={toggleMobileMenu}
             >
-              <span className="sr-only">メニューを開く</span>
+              <span className="sr-only">{isMobileMenuOpen ? 'メニューを閉じる' : 'メニューを開く'}</span>
               {/* ハンバーガーアイコン */}
-              <div className="w-6 h-6 relative">
+              <div className="w-5 h-5 sm:w-6 sm:h-6 relative">
                 <span
                   className={`
-                    absolute block h-0.5 w-6 bg-current transform transition-all duration-300 ease-in-out
+                    absolute block h-0.5 w-full bg-current transform transition-all duration-300 ease-in-out
                     ${isMobileMenuOpen ? 'rotate-45 translate-y-2' : 'translate-y-1'}
                   `}
                 ></span>
                 <span
                   className={`
-                    absolute block h-0.5 w-6 bg-current transform transition-all duration-300 ease-in-out
+                    absolute block h-0.5 w-full bg-current transform transition-all duration-300 ease-in-out
                     ${isMobileMenuOpen ? 'opacity-0' : 'translate-y-2'}
                   `}
                 ></span>
                 <span
                   className={`
-                    absolute block h-0.5 w-6 bg-current transform transition-all duration-300 ease-in-out
+                    absolute block h-0.5 w-full bg-current transform transition-all duration-300 ease-in-out
                     ${isMobileMenuOpen ? '-rotate-45 translate-y-2' : 'translate-y-3'}
                   `}
                 ></span>
@@ -135,16 +135,16 @@ const Header = () => {
         `}
         id="mobile-menu"
       >
-        <div className="px-4 py-6 space-y-1 bg-white">
+        <div className="px-3 sm:px-4 py-4 sm:py-6 space-y-1 bg-white max-h-[calc(100vh-theme(spacing.16))] overflow-y-auto">
           {navigationItems.map((item) => (
             <Link
               key={item.name}
               href={item.href}
               className={`
-                block px-4 py-3 rounded-lg text-base font-medium transition-all duration-300
+                block px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-medium transition-all duration-300 touch-manipulation
                 ${isActivePage(item.href)
                   ? 'text-secondary-700 bg-secondary-50 border-l-4 border-secondary-700'
-                  : 'text-text-primary hover:text-secondary-700 hover:bg-neutral-100'
+                  : 'text-text-primary hover:text-secondary-700 hover:bg-neutral-100 active:bg-neutral-200'
                 }
               `}
               onClick={closeMobileMenu}
@@ -152,7 +152,7 @@ const Header = () => {
               <div className="flex flex-col">
                 <span>{item.name}</span>
                 {item.description && (
-                  <span className="text-xs text-text-muted mt-1">
+                  <span className="text-xs text-text-muted mt-0.5 sm:mt-1">
                     {item.description}
                   </span>
                 )}

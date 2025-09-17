@@ -119,6 +119,7 @@ const config: Config = {
       },
       // レスポンシブブレークポイント（設計書に基づく）
       screens: {
+        'xs': '480px',  // Large Mobile
         'sm': '640px',  // Mobile以上
         'md': '768px',  // Tablet
         'lg': '1024px', // Desktop以上
@@ -174,6 +175,17 @@ const config: Config = {
           '100%': { transform: 'translateY(0)', opacity: '1' },
         },
       },
+      // カスタムユーティリティ（縦書きサポート）
+      writingMode: {
+        'vertical-rl': 'vertical-rl',
+        'vertical-lr': 'vertical-lr',
+        'horizontal-tb': 'horizontal-tb',
+      },
+      textOrientation: {
+        'mixed': 'mixed',
+        'upright': 'upright',
+        'sideways': 'sideways',
+      },
     },
   },
   plugins: [
@@ -181,6 +193,22 @@ const config: Config = {
     require('@tailwindcss/typography'),
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     require('@tailwindcss/line-clamp'),
+    // カスタムプラグイン
+    function({ addUtilities }: { addUtilities: (utilities: Record<string, Record<string, string>>) => void }) {
+      const newUtilities = {
+        '.writing-mode-vertical': {
+          'writing-mode': 'vertical-rl',
+          'text-orientation': 'mixed',
+        },
+        '.text-orientation-mixed': {
+          'text-orientation': 'mixed',
+        },
+        '.text-orientation-upright': {
+          'text-orientation': 'upright',
+        },
+      }
+      addUtilities(newUtilities)
+    },
   ],
 }
 

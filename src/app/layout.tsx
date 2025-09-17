@@ -21,6 +21,7 @@ const notoSansJP = Noto_Sans_JP({
 
 // メタデータ設定（設計書のSEO要件に基づく）
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://renjoin.temple'),
   title: {
     default: '蓮城院 | 曹洞宗の寺院',
     template: '%s | 蓮城院'

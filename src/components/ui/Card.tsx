@@ -55,7 +55,7 @@ export const Card = ({
         aria-label={`「${title}」の詳細を読む`}
       >
         {/* 背景とボーダー */}
-        <div className="relative h-full bg-white border border-gray-200 rounded-lg shadow-sm group-hover:shadow-md transition-shadow duration-300">
+        <div className="relative h-full bg-white border border-gray-200 rounded-lg shadow-sm group-hover:shadow-md transition-shadow duration-300 min-h-[300px] flex flex-col">
 
           {/* 画像セクション */}
           {image && (
@@ -73,17 +73,17 @@ export const Card = ({
           )}
 
           {/* コンテンツセクション */}
-          <div className="p-6">
+          <div className="p-4 sm:p-6 flex-1 flex flex-col">
             {/* カテゴリーと日付 */}
-            <div className="flex items-center justify-between mb-3 text-sm">
+            <div className="flex flex-col xs:flex-row xs:items-center xs:justify-between mb-3 gap-2 xs:gap-0 text-sm">
               {category && (
-                <span className="inline-flex px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                <span className="inline-flex px-2 sm:px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 self-start">
                   {category}
                 </span>
               )}
               <time
                 dateTime={date}
-                className={`text-gray-600 font-medium ${category ? '' : 'ml-auto'}`}
+                className={`text-gray-600 font-medium text-xs sm:text-sm ${category ? '' : 'ml-auto'}`}
               >
                 {new Date(date).toLocaleDateString('ja-JP', {
                   year: 'numeric',
@@ -94,13 +94,13 @@ export const Card = ({
             </div>
 
             {/* タイトル */}
-            <h3 className="font-serif text-lg font-semibold text-gray-900 mb-3 leading-tight group-hover:text-amber-800 transition-colors duration-200">
+            <h3 className="font-serif text-base sm:text-lg font-semibold text-gray-900 mb-3 leading-tight group-hover:text-amber-800 transition-colors duration-200 line-clamp-2">
               {title}
             </h3>
 
             {/* 概要文 */}
             {excerpt && (
-              <p className="text-gray-700 text-sm leading-relaxed line-clamp-3">
+              <p className="text-gray-700 text-xs sm:text-sm leading-relaxed line-clamp-3 flex-1">
                 {excerpt}
               </p>
             )}
@@ -109,10 +109,10 @@ export const Card = ({
             {children}
 
             {/* 続きを読むインディケーター */}
-            <div className="mt-4 flex items-center text-amber-700 text-sm font-medium">
+            <div className="mt-auto pt-3 flex items-center text-amber-700 text-xs sm:text-sm font-medium">
               <span>続きを読む</span>
               <svg
-                className="ml-2 w-4 h-4 transition-transform duration-200 group-hover:translate-x-1"
+                className="ml-2 w-3 h-3 sm:w-4 sm:h-4 transition-transform duration-200 group-hover:translate-x-1"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -225,13 +225,13 @@ export const CardGrid = ({
 
   const columnClasses = {
     1: 'grid-cols-1',
-    2: 'grid-cols-1 md:grid-cols-2',
-    3: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
-    4: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+    2: 'grid-cols-1 sm:grid-cols-2',
+    3: 'grid-cols-1 xs:grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
+    4: 'grid-cols-1 xs:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4'
   }
 
   return (
-    <div className={`grid ${columnClasses[columns]} ${gapClasses[gap]} ${className}`}>
+    <div className={`grid ${columnClasses[columns]} ${gapClasses[gap]} auto-rows-fr ${className}`}>
       {children}
     </div>
   )
@@ -263,21 +263,21 @@ export const FeatureCard = ({
   className = ''
 }: FeatureCardProps) => {
   const content = (
-    <div className={`group relative p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer ${className}`}>
+    <div className={`group relative p-4 sm:p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer ${className}`}>
       {/* アイコン */}
       {icon && (
-        <div className="mb-4 text-amber-600">
+        <div className="mb-3 sm:mb-4 text-amber-600">
           {icon}
         </div>
       )}
 
       {/* タイトル */}
-      <h3 className="font-serif text-xl font-semibold text-gray-900 mb-3 group-hover:text-amber-800 transition-colors duration-200">
+      <h3 className="font-serif text-lg sm:text-xl font-semibold text-gray-900 mb-2 sm:mb-3 group-hover:text-amber-800 transition-colors duration-200">
         {title}
       </h3>
 
       {/* 説明文 */}
-      <p className="text-gray-700 leading-relaxed">
+      <p className="text-gray-700 text-sm sm:text-base leading-relaxed">
         {description}
       </p>
 
