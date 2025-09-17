@@ -1,26 +1,213 @@
+/* Google Fonts - 日本語フォント読み込み */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap');
+
+/* Tailwind CSS */
 @import "tailwindcss";
 
+/* CSS変数設定（和モダンカラーパレット） */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* カラーパレット */
+  --color-primary: #2d3748;      /* 墨色 */
+  --color-secondary: #b8860b;    /* 金茶色 */
+  --color-accent: #c53030;       /* 朱色 */
+  --color-neutral: #f7fafc;      /* 白系 */
+  --color-text-primary: #1a202c; /* メインテキスト */
+  --color-text-secondary: #4a5568; /* サブテキスト */
+  --color-text-muted: #718096;   /* ミュートテキスト */
+  --color-bg-primary: #ffffff;   /* メイン背景 */
+  --color-bg-secondary: #f7fafc; /* サブ背景 */
+  --color-bg-muted: #edf2f7;     /* ミュート背景 */
+
+  /* フォント設定 */
+  --font-serif: 'Noto Serif JP', 'Hiragino Mincho ProN', 'Hiragino Mincho Pro', 'Yu Mincho', 'YuMincho', serif;
+  --font-sans: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Yu Gothic', 'YuGothic', 'Meiryo', sans-serif;
+
+  /* スペーシング */
+  --spacing-section: 4rem;       /* セクション間 */
+  --spacing-component: 2rem;     /* コンポーネント間 */
+  --spacing-element: 1rem;       /* 要素間 */
+
+  /* トランジション */
+  --transition-fast: 150ms ease-in-out;
+  --transition-normal: 300ms ease-in-out;
+  --transition-slow: 500ms ease-in-out;
+
+  /* ボーダーラジアス */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;
+
+  /* シャドウ */
+  --shadow-zen: 0 4px 6px -1px rgba(45, 55, 72, 0.1), 0 2px 4px -1px rgba(45, 55, 72, 0.06);
+  --shadow-zen-lg: 0 10px 15px -3px rgba(45, 55, 72, 0.1), 0 4px 6px -2px rgba(45, 55, 72, 0.05);
 }
 
+/* Tailwind テーマインライン設定 */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-primary-50: rgb(247 250 252);
+  --color-primary-100: rgb(237 242 247);
+  --color-primary-200: rgb(226 232 240);
+  --color-primary-300: rgb(203 213 224);
+  --color-primary-400: rgb(160 174 192);
+  --color-primary-500: rgb(113 128 150);
+  --color-primary-600: rgb(74 85 104);
+  --color-primary-700: rgb(45 55 72);
+  --color-primary-800: rgb(26 32 44);
+  --color-primary-900: rgb(23 25 35);
+
+  --color-secondary-50: rgb(254 252 243);
+  --color-secondary-100: rgb(253 248 225);
+  --color-secondary-200: rgb(251 239 194);
+  --color-secondary-300: rgb(247 228 152);
+  --color-secondary-400: rgb(241 213 108);
+  --color-secondary-500: rgb(235 200 73);
+  --color-secondary-600: rgb(212 175 55);
+  --color-secondary-700: rgb(184 134 11);
+  --color-secondary-800: rgb(153 111 10);
+  --color-secondary-900: rgb(122 86 8);
+
+  --color-accent-50: rgb(254 242 242);
+  --color-accent-100: rgb(254 226 226);
+  --color-accent-200: rgb(254 202 202);
+  --color-accent-300: rgb(252 165 165);
+  --color-accent-400: rgb(248 113 113);
+  --color-accent-500: rgb(239 68 68);
+  --color-accent-600: rgb(220 38 38);
+  --color-accent-700: rgb(197 48 48);
+  --color-accent-800: rgb(153 27 27);
+  --color-accent-900: rgb(127 29 29);
+
+  --font-serif: var(--font-serif);
+  --font-sans: var(--font-sans);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ベーススタイル */
+html {
+  scroll-behavior: smooth;
+  font-feature-settings: "kern" 1, "liga" 1;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-primary);
+  overflow-x: hidden;
+}
+
+/* 縦書きテキスト用ユーティリティクラス */
+.vertical-text {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+}
+
+.vertical-text-mixed {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
+
+.vertical-text-sideways {
+  writing-mode: vertical-rl;
+  text-orientation: sideways;
+}
+
+/* 日本語固有のテキストスタイル */
+.text-emphasis {
+  text-emphasis: dot;
+  text-emphasis-position: over right;
+}
+
+.text-combine-upright {
+  text-combine-upright: all;
+}
+
+/* 和風装飾クラス */
+.zen-border {
+  border: 1px solid var(--color-primary);
+  border-image: linear-gradient(45deg, var(--color-primary), var(--color-secondary)) 1;
+}
+
+.zen-divider {
+  position: relative;
+}
+
+.zen-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  width: 100px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-secondary), transparent);
+}
+
+/* スクロールバーのカスタマイズ */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-secondary);
+}
+
+/* セレクション（テキスト選択）スタイル */
+::selection {
+  background-color: var(--color-secondary);
+  color: var(--color-bg-primary);
+}
+
+::-moz-selection {
+  background-color: var(--color-secondary);
+  color: var(--color-bg-primary);
+}
+
+/* フォーカススタイル（アクセシビリティ） */
+:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* プリント用スタイル */
+@media print {
+  body {
+    font-size: 12pt;
+    line-height: 1.4;
+    color: black;
+    background: white;
+  }
+
+  .vertical-text {
+    writing-mode: horizontal-tb;
+    text-orientation: mixed;
+  }
+}
+
+/* ダークモード対応（将来的な拡張用） */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-text-primary: #f7fafc;
+    --color-text-secondary: #e2e8f0;
+    --color-text-muted: #a0aec0;
+    --color-bg-primary: #1a202c;
+    --color-bg-secondary: #2d3748;
+    --color-bg-muted: #4a5568;
+  }
 }

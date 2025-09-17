@@ -8,7 +8,7 @@
  * @version 1.0.0 MVP版
  */
 
-import { createClient } from 'next-sanity'
+import { createClient } from '@sanity/client'
 
 // 環境変数の型安全性を確保
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!
