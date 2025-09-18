@@ -10,13 +10,19 @@
  */
 
 import { Metadata } from 'next'
-import { notFound } from 'next/navigation'
 import { PortableText } from '@portabletext/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { fetchPages } from '../../../lib/sanity'
 import { sanitizeText } from '../../../lib/sanitize'
+import { generateSEOMetadata, StructuredData, generateBreadcrumbData } from '../../components/common/SEO'
 import type { Page } from '../../../types/sanity'
+
+// ISR設定：由緒ページは1日ごとに再生成（あまり変更しないため）
+export const revalidate = 86400 // 1日（24時間）
+
+// 静的生成の設定
+export const dynamic = 'force-static'
 
 // ページスラッグの定数
 const PAGE_SLUG = 'about'
@@ -24,28 +30,37 @@ const PAGE_SLUG = 'about'
 /**
  * フォールバック用のページデータ
  */
-const fallbackPageData = {
+const fallbackPageData: Page = {
+  _id: 'fallback-about',
+  _type: 'page',
+  _createdAt: new Date().toISOString(),
+  _updatedAt: new Date().toISOString(),
   title: '由緒・歴史',
+  slug: { current: 'about', _type: 'slug' },
   body: [
     {
+      _key: 'fallback-h2-1',
       _type: 'block',
       style: 'h2',
-      children: [{ _type: 'span', text: '蓮城院の由緒' }]
+      children: [{ _key: 'fallback-span-1', _type: 'span', text: '蓮城院の由緒' }]
     },
     {
+      _key: 'fallback-normal-1',
       _type: 'block',
       style: 'normal',
-      children: [{ _type: 'span', text: '蓮城院は長い歴史を持つ由緒正しい寺院です。詳細な歴史については、現在データを準備中です。' }]
+      children: [{ _key: 'fallback-span-2', _type: 'span', text: '蓮城院は長い歴史を持つ由緒正しい寺院です。詳細な歴史については、現在データを準備中です。' }]
     },
     {
+      _key: 'fallback-h2-2',
       _type: 'block',
       style: 'h2',
-      children: [{ _type: 'span', text: '寺院の沿革' }]
+      children: [{ _key: 'fallback-span-3', _type: 'span', text: '寺院の沿革' }]
     },
     {
+      _key: 'fallback-normal-2',
       _type: 'block',
       style: 'normal',
-      children: [{ _type: 'span', text: '代々受け継がれてきた伝統と歴史を大切にし、地域の皆様とともに歩んでまいりました。' }]
+      children: [{ _key: 'fallback-span-4', _type: 'span', text: '代々受け継がれてきた伝統と歴史を大切にし、地域の皆様とともに歩んでまいりました。' }]
     }
   ],
   metaDescription: '蓮城院の由緒と歴史についてご紹介します。'
@@ -72,21 +87,14 @@ export async function generateMetadata(): Promise<Metadata> {
     ? sanitizeText(finalPageData.metaDescription)
     : '蓮城院の由緒と歴史についてご紹介します。'
 
-  return {
-    title: `${sanitizedTitle} | 蓮城院`,
+  return generateSEOMetadata({
+    title: sanitizedTitle,
     description: sanitizedDescription,
-    openGraph: {
-      title: `${sanitizedTitle} | 蓮城院`,
-      description: sanitizedDescription,
-      type: 'website',
-      locale: 'ja_JP',
-    },
-    twitter: {
-      card: 'summary',
-      title: `${sanitizedTitle} | 蓮城院`,
-      description: sanitizedDescription,
-    },
-  }
+    url: '/about',
+    type: 'website',
+    keywords: ['蓮城院', '由緒', '歴史', '曹洞宗', '寺院', '沿革'],
+    canonical: '/about'
+  })
 }
 
 /**
@@ -215,6 +223,16 @@ const portableTextComponents = {
 }
 
 /**
+ * パンくずリスト生成関数
+ */
+function generateBreadcrumbs() {
+  return [
+    { name: 'ホーム', url: '/' },
+    { name: '由緒・歴史', url: '/about' }
+  ]
+}
+
+/**
  * 由緒・歴史ページコンポーネント
  */
 export default async function AboutPage() {
@@ -235,7 +253,14 @@ export default async function AboutPage() {
   const sanitizedTitle = sanitizeText(finalPageData.title)
 
   return (
-    <div className="min-h-screen bg-white">
+    <>
+      {/* 構造化データ - パンくずリスト */}
+      <StructuredData
+        type="BreadcrumbList"
+        data={generateBreadcrumbData(generateBreadcrumbs())}
+      />
+
+      <div className="min-h-screen bg-white">
       {/* ヘッダー部分 */}
       <div className="bg-gradient-to-r from-gray-50 to-amber-50 border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -293,6 +318,7 @@ export default async function AboutPage() {
           </div>
         </div>
       </main>
-    </div>
+      </div>
+    </>
   )
 }

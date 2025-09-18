@@ -10,7 +10,6 @@
  */
 
 import { Metadata } from 'next'
-import { notFound } from 'next/navigation'
 import { PortableText } from '@portabletext/react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -18,34 +17,49 @@ import { fetchPages } from '../../../lib/sanity'
 import { sanitizeText } from '../../../lib/sanitize'
 import type { Page } from '../../../types/sanity'
 
+// ISR設定：利用規約は1週間ごとに再生成
+export const revalidate = 604800 // 1週間（7日間）
+
+// 静的生成の設定
+export const dynamic = 'force-static'
+
 // ページスラッグの定数
 const PAGE_SLUG = 'terms'
 
 /**
  * フォールバック用のページデータ
  */
-const fallbackPageData = {
+const fallbackPageData: Page = {
+  _id: 'fallback-terms',
+  _type: 'page',
+  _createdAt: new Date().toISOString(),
+  _updatedAt: new Date().toISOString(),
   title: '利用規約',
+  slug: { current: 'terms', _type: 'slug' },
   body: [
     {
+      _key: 'fallback-h2-1',
       _type: 'block',
       style: 'h2',
-      children: [{ _type: 'span', text: 'サイトの利用について' }]
+      children: [{ _key: 'fallback-span-1', _type: 'span', text: 'サイトの利用について' }]
     },
     {
+      _key: 'fallback-normal-1',
       _type: 'block',
       style: 'normal',
-      children: [{ _type: 'span', text: '蓮城院公式サイトをご利用いただく際は、以下の利用規約を遵守していただくようお願いいたします。' }]
+      children: [{ _key: 'fallback-span-2', _type: 'span', text: '蓮城院公式サイトをご利用いただく際は、以下の利用規約を遵守していただくようお願いいたします。' }]
     },
     {
+      _key: 'fallback-h2-2',
       _type: 'block',
       style: 'h2',
-      children: [{ _type: 'span', text: '著作権について' }]
+      children: [{ _key: 'fallback-span-3', _type: 'span', text: '著作権について' }]
     },
     {
+      _key: 'fallback-normal-2',
       _type: 'block',
       style: 'normal',
-      children: [{ _type: 'span', text: '本サイトのコンテンツは著作権法により保護されています。無断転載、複製は禁止されています。' }]
+      children: [{ _key: 'fallback-span-4', _type: 'span', text: '本サイトのコンテンツは著作権法により保護されています。無断転載、複製は禁止されています。' }]
     }
   ],
   metaDescription: '蓮城院公式サイトの利用規約です。'

@@ -1,63 +1,38 @@
 import { Suspense } from 'react'
-import { Metadata } from 'next'
 import Link from 'next/link'
 import { fetchHomePageData } from '../../lib/sanity'
-import { sanitizeHtml } from '../../lib/sanitize'
+import { generateSEOMetadata, StructuredData, generateOrganizationData } from '../components/common/SEO'
 
 // コンポーネントのインポート
 import { HeroSection } from '../components/sections/HeroSection'
-import { AboutSection } from '../components/sections/AboutSection'
-import { AccessSection } from '../components/sections/AccessSection'
 import { BlogCard, NewsCard, CardGrid, CardSkeleton } from '../components/ui/Card'
+
+// パフォーマンス最適化：ファーストビューでないコンポーネントを遅延読み込み
+import { DynamicAboutSection, DynamicAccessSection } from '../components/utils/DynamicComponents'
 
 // 型定義のインポート
 import type { HomePageData } from '../../types/sanity'
+
+// ISR設定：トップページは15分ごとに再生成（頻繁な更新があるため）
+export const revalidate = 900 // 15分（900秒）
+
+// 静的生成の設定
+export const dynamic = 'force-static'
 
 // ========================
 // SEOメタデータ
 // ========================
 
-export const metadata: Metadata = {
-  title: '蓮城院 - 曹洞宗の寺院 | 千年の祈り、永遠の安らぎ',
+export const metadata = generateSEOMetadata({
+  title: '千年の祈り、永遠の安らぎ',
   description: '蓮城院は曹洞宗の寺院として、地域の皆様と共に歩み続けています。只管打坐の教えを基に、心の安らぎを求める方々をお迎えしています。副住職・荒木弘文のブログも掲載しております。',
-  keywords: '蓮城院,曹洞宗,寺院,仏教,禅,只管打坐,副住職,荒木弘文,ブログ,お知らせ,法要,地域',
-  openGraph: {
-    title: '蓮城院 - 曹洞宗の寺院',
-    description: '千年の祈り、永遠の安らぎ。曹洞宗の教えのもと、地域の皆様と共に歩み続ける寺院です。',
-    url: 'https://renjoin.jp',
-    siteName: '蓮城院公式サイト',
-    images: [
-      {
-        url: '/images/og-image.jpg',
-        width: 1200,
-        height: 630,
-        alt: '蓮城院境内の風景'
-      }
-    ],
-    locale: 'ja_JP',
-    type: 'website'
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: '蓮城院 - 曹洞宗の寺院',
-    description: '千年の祈り、永遠の安らぎ。曹洞宗の教えのもと、地域の皆様と共に歩み続ける寺院です。',
-    images: ['/images/og-image.jpg']
-  },
-  alternates: {
-    canonical: 'https://renjoin.jp'
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1
-    }
-  }
-}
+  url: '/',
+  type: 'website',
+  keywords: ['蓮城院', '曹洞宗', '寺院', '仏教', '禅', '只管打坐', '副住職', '荒木弘文', 'ブログ', 'お知らせ', '法要', '地域'],
+  ogImage: '/images/og-image.jpg',
+  ogImageAlt: '蓮城院境内の風景',
+  canonical: '/',
+})
 
 // ========================
 // メインコンポーネント
@@ -66,40 +41,10 @@ export const metadata: Metadata = {
 export default async function HomePage() {
   return (
     <div className="bg-bg-primary">
-      {/* JSON-LD構造化データ */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: sanitizeHtml(JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Place",
-            "@id": "https://renjoin.jp/#place",
-            "name": "蓮城院",
-            "description": "曹洞宗の寺院として、地域の皆様と共に歩み続けています。",
-            "url": "https://renjoin.jp",
-            "telephone": "+81-12-345-6789",
-            "address": {
-              "@type": "PostalAddress",
-              "addressCountry": "JP",
-              "addressRegion": "○○県",
-              "addressLocality": "○○市",
-              "streetAddress": "○○町1-2-3",
-              "postalCode": "123-4567"
-            },
-            "geo": {
-              "@type": "GeoCoordinates",
-              "latitude": 35.6812362,
-              "longitude": 139.7670516
-            },
-            "openingHours": "Mo-Su 06:00-18:00",
-            "religion": "Buddhism",
-            "denomination": "曹洞宗",
-            "sameAs": [
-              "https://renjoin.jp/about",
-              "https://renjoin.jp/blog"
-            ]
-          }))
-        }}
+      {/* JSON-LD構造化データ - 組織情報 */}
+      <StructuredData
+        type="Organization"
+        data={generateOrganizationData()}
       />
 
       {/* ヒーローセクション */}
@@ -167,11 +112,11 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 由緒セクション */}
-      <AboutSection />
+      {/* 由緒セクション（遅延読み込み） */}
+      <DynamicAboutSection />
 
-      {/* アクセスセクション */}
-      <AccessSection />
+      {/* アクセスセクション（遅延読み込み） */}
+      <DynamicAccessSection />
     </div>
   )
 }

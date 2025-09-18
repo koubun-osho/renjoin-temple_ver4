@@ -1,0 +1,346 @@
+/**
+ * 蓮城院公式サイト - Web Vitals Analytics API
+ *
+ * Core Web Vitalsとパフォーマンスメトリクスを収集・分析
+ * Google Analytics 4と連携してパフォーマンス監視を実現
+ *
+ * @created 2025-09-18
+ * @version 1.0.0 Performance Optimization版
+ * @task P4-04 - パフォーマンス最適化
+ */
+
+import { NextRequest, NextResponse } from 'next/server'
+
+// ========================
+// 型定義
+// ========================
+
+interface WebVitalMetric {
+  name: 'CLS' | 'FID' | 'FCP' | 'LCP' | 'TTFB' | 'INP'
+  value: number
+  rating: 'good' | 'needs-improvement' | 'poor'
+  delta: number
+  entries: PerformanceEntry[]
+  id: string
+  navigationType: 'navigate' | 'reload' | 'back-forward' | 'prerender'
+}
+
+interface PerformanceData {
+  url: string
+  userAgent: string
+  connectionType?: string
+  timestamp: number
+  metrics: WebVitalMetric[]
+  additionalData?: {
+    deviceType?: 'mobile' | 'tablet' | 'desktop'
+    viewport?: { width: number; height: number }
+    loadTime?: number
+    domContentLoaded?: number
+    firstPaint?: number
+    largestContentfulPaint?: number
+  }
+}
+
+// ========================
+// Core Web Vitals 閾値
+// ========================
+
+const METRIC_THRESHOLDS = {
+  CLS: { good: 0.1, poor: 0.25 },
+  FID: { good: 100, poor: 300 },
+  FCP: { good: 1800, poor: 3000 },
+  LCP: { good: 2500, poor: 4000 },
+  TTFB: { good: 800, poor: 1800 },
+  INP: { good: 200, poor: 500 }
+} as const
+
+// ========================
+// データ検証
+// ========================
+
+/**
+ * Web Vitalsデータを検証
+ */
+function validateWebVitalData(data: unknown): data is PerformanceData {
+  if (!data || typeof data !== 'object') return false
+
+  // 必須フィールドのチェック
+  if (!data.url || typeof data.url !== 'string') return false
+  if (!data.userAgent || typeof data.userAgent !== 'string') return false
+  if (!data.timestamp || typeof data.timestamp !== 'number') return false
+  if (!Array.isArray(data.metrics)) return false
+
+  // メトリクスの検証
+  return data.metrics.every((metric: unknown) => {
+    return (
+      metric &&
+      typeof metric.name === 'string' &&
+      typeof metric.value === 'number' &&
+      typeof metric.rating === 'string' &&
+      ['CLS', 'FID', 'FCP', 'LCP', 'TTFB', 'INP'].includes(metric.name) &&
+      ['good', 'needs-improvement', 'poor'].includes(metric.rating)
+    )
+  })
+}
+
+/**
+ * メトリクスの評価を計算
+ */
+function calculateRating(metricName: string, value: number): 'good' | 'needs-improvement' | 'poor' {
+  const thresholds = METRIC_THRESHOLDS[metricName as keyof typeof METRIC_THRESHOLDS]
+  if (!thresholds) return 'poor'
+
+  if (value <= thresholds.good) return 'good'
+  if (value <= thresholds.poor) return 'needs-improvement'
+  return 'poor'
+}
+
+// ========================
+// Google Analytics 4 送信
+// ========================
+
+/**
+ * Google Analytics 4にWeb Vitalsデータを送信
+ */
+async function sendToGA4(data: PerformanceData) {
+  const GA4_MEASUREMENT_ID = process.env.GA4_MEASUREMENT_ID
+  const GA4_API_SECRET = process.env.GA4_API_SECRET
+
+  if (!GA4_MEASUREMENT_ID || !GA4_API_SECRET) {
+    console.warn('GA4の設定が不完全です。Web Vitalsデータは送信されません。')
+    return
+  }
+
+  try {
+    const events = data.metrics.map(metric => ({
+      name: 'web_vitals',
+      params: {
+        metric_name: metric.name,
+        metric_value: metric.value,
+        metric_rating: metric.rating,
+        metric_delta: metric.delta,
+        page_url: data.url,
+        navigation_type: metric.navigationType,
+        user_agent: data.userAgent,
+        device_type: data.additionalData?.deviceType || 'unknown',
+        connection_type: data.connectionType || 'unknown'
+      }
+    }))
+
+    const response = await fetch(
+      `https://www.google-analytics.com/mp/collect?measurement_id=${GA4_MEASUREMENT_ID}&api_secret=${GA4_API_SECRET}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          client_id: generateClientId(data.userAgent),
+          events
+        })
+      }
+    )
+
+    if (!response.ok) {
+      throw new Error(`GA4送信エラー: ${response.status}`)
+    }
+
+    console.log('Web VitalsデータをGA4に送信しました', {
+      url: data.url,
+      metricsCount: data.metrics.length
+    })
+
+  } catch (error) {
+    console.error('GA4送信エラー:', error)
+  }
+}
+
+/**
+ * クライアントIDを生成
+ */
+function generateClientId(userAgent: string): string {
+  // User-Agentベースの簡単なハッシュ生成
+  let hash = 0
+  for (let i = 0; i < userAgent.length; i++) {
+    const char = userAgent.charCodeAt(i)
+    hash = ((hash << 5) - hash) + char
+    hash = hash & hash // 32bit整数に変換
+  }
+  return Math.abs(hash).toString()
+}
+
+// ========================
+// パフォーマンス分析
+// ========================
+
+/**
+ * パフォーマンス分析レポートを生成
+ */
+function analyzePerformance(data: PerformanceData) {
+  const analysis = {
+    url: data.url,
+    timestamp: data.timestamp,
+    overall_score: 0,
+    metrics_summary: {} as Record<string, unknown>,
+    recommendations: [] as string[],
+    device_info: {
+      type: data.additionalData?.deviceType || 'unknown',
+      viewport: data.additionalData?.viewport,
+      user_agent: data.userAgent
+    }
+  }
+
+  // メトリクス別分析
+  let goodCount = 0
+  const totalMetrics = data.metrics.length
+
+  data.metrics.forEach(metric => {
+    analysis.metrics_summary[metric.name] = {
+      value: metric.value,
+      rating: metric.rating,
+      threshold_good: METRIC_THRESHOLDS[metric.name]?.good,
+      threshold_poor: METRIC_THRESHOLDS[metric.name]?.poor
+    }
+
+    if (metric.rating === 'good') goodCount++
+
+    // 個別の推奨事項
+    if (metric.rating === 'poor') {
+      switch (metric.name) {
+        case 'LCP':
+          analysis.recommendations.push('LCP改善: 画像最適化、サーバーレスポンス時間の短縮を検討してください')
+          break
+        case 'FID':
+          analysis.recommendations.push('FID改善: JavaScriptの実行時間を短縮、コード分割を検討してください')
+          break
+        case 'CLS':
+          analysis.recommendations.push('CLS改善: レイアウトシフトの原因となる要素を特定し、サイズを事前指定してください')
+          break
+        case 'FCP':
+          analysis.recommendations.push('FCP改善: クリティカルCSSのインライン化、フォントの最適化を検討してください')
+          break
+        case 'TTFB':
+          analysis.recommendations.push('TTFB改善: サーバーパフォーマンスの最適化、CDNの活用を検討してください')
+          break
+        case 'INP':
+          analysis.recommendations.push('INP改善: インタラクションの応答性向上、重いJavaScript処理の最適化を検討してください')
+          break
+      }
+    }
+  })
+
+  // 総合スコア計算 (0-100)
+  analysis.overall_score = Math.round((goodCount / totalMetrics) * 100)
+
+  // 全体的な推奨事項
+  if (analysis.overall_score < 70) {
+    analysis.recommendations.push('全体的なパフォーマンス改善が必要です。画像最適化、コード分割、キャッシュ戦略の見直しを検討してください')
+  } else if (analysis.overall_score < 90) {
+    analysis.recommendations.push('パフォーマンスは良好ですが、さらなる最適化の余地があります')
+  }
+
+  return analysis
+}
+
+// ========================
+// APIハンドラー
+// ========================
+
+/**
+ * Web Vitalsデータを受信・処理
+ */
+export async function POST(request: NextRequest) {
+  try {
+    const data = await request.json()
+
+    // データ検証
+    if (!validateWebVitalData(data)) {
+      return NextResponse.json(
+        { error: 'Invalid data format' },
+        { status: 400 }
+      )
+    }
+
+    // レート評価の再計算（信頼性向上のため）
+    data.metrics.forEach((metric: WebVitalMetric) => {
+      metric.rating = calculateRating(metric.name, metric.value)
+    })
+
+    // Google Analytics 4に送信
+    await sendToGA4(data)
+
+    // パフォーマンス分析
+    const analysis = analyzePerformance(data)
+
+    // ログ出力（開発環境のみ）
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Web Vitals received:', {
+        url: data.url,
+        metrics: data.metrics.map(m => `${m.name}: ${m.value} (${m.rating})`),
+        overall_score: analysis.overall_score
+      })
+    }
+
+    return NextResponse.json({
+      success: true,
+      analysis,
+      message: 'Web Vitals data processed successfully'
+    })
+
+  } catch (error) {
+    console.error('Web Vitals API Error:', error)
+
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
+
+/**
+ * パフォーマンス統計を取得（管理用）
+ */
+export async function GET() {
+  try {
+    // 管理者用の統計情報を返す
+    // 実際の実装では、データベースから統計を取得する
+
+    const stats = {
+      last_24_hours: {
+        total_measurements: 0,
+        average_scores: {
+          LCP: 0,
+          FID: 0,
+          CLS: 0
+        },
+        page_performance: []
+      },
+      recommendations: [
+        '定期的なパフォーマンス監視を継続してください',
+        'Core Web Vitalsの改善に継続的に取り組んでください'
+      ]
+    }
+
+    return NextResponse.json(stats)
+
+  } catch (error) {
+    console.error('Web Vitals Statistics Error:', error)
+
+    return NextResponse.json(
+      { error: 'Failed to fetch statistics' },
+      { status: 500 }
+    )
+  }
+}
+
+// OPTIONS ハンドラー（CORS対応）
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    },
+  })
+}

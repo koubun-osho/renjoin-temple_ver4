@@ -18,15 +18,29 @@ import Image from 'next/image'
 import { PortableText, PortableTextComponents } from '@portabletext/react'
 import type { TypedObject } from '@portabletext/types'
 import { fetchBlogPosts } from '../../../../lib/sanity'
-import { sanitizeText, sanitizeUrl, sanitizeImageUrl, sanitizePortableText, sanitizeJsonLd } from '../../../../lib/sanitize'
+import BlogAnalytics from '@/components/blog/BlogAnalytics'
+import { sanitizeText, sanitizeUrl, sanitizeImageUrl, sanitizePortableText } from '../../../../lib/sanitize'
+import { generateSEOMetadata, StructuredData, generateBlogPostData, generateBreadcrumbData } from '../../../components/common/SEO'
 import type { BlogPost } from '../../../../types/sanity'
 
-// 静的パス生成
+// ISR設定：ブログ記事は1時間ごとに再生成
+export const revalidate = 3600 // 1時間（3600秒）
+
+// 動的ルートの設定
+export const dynamic = 'force-static'
+export const dynamicParams = true
+
+// 静的パス生成（パフォーマンス最適化版）
 export async function generateStaticParams() {
   try {
     const slugs = await fetchBlogPosts.slugs()
 
-    return slugs.map((item) => ({
+    // 本番環境では最初の20件のみビルド時に生成（パフォーマンス最適化）
+    const limitedSlugs = process.env.NODE_ENV === 'production'
+      ? slugs.slice(0, 20)
+      : slugs
+
+    return limitedSlugs.map((item) => ({
       slug: item.slug.current
     }))
   } catch (error) {
@@ -46,37 +60,38 @@ export async function generateMetadata({
     const post = await fetchBlogPosts.detail(slug)
 
     if (!post) {
-      return {
-        title: 'ページが見つかりません | 蓮城院',
-        description: '指定されたブログ記事が見つかりませんでした。'
-      }
+      return generateSEOMetadata({
+        title: 'ページが見つかりません',
+        description: '指定されたブログ記事が見つかりませんでした。',
+        noindex: true
+      })
     }
 
     const title = sanitizeText(post.title)
-    const description = post.excerpt ? sanitizeText(post.excerpt) : '蓮城院からのお知らせ'
+    const description = post.excerpt ? sanitizeText(post.excerpt) : '副住職・荒木弘文によるブログ記事'
+    const ogImage = post.mainImage?.asset ?
+      sanitizeImageUrl(`${post.mainImage.asset._ref}`) :
+      '/images/og-image.jpg'
 
-    return {
-      title: `${title} | 蓮城院ブログ`,
+    return generateSEOMetadata({
+      title,
       description,
-      openGraph: {
-        title,
-        description,
-        type: 'article',
-        publishedTime: post.publishedAt,
-        images: post.mainImage?.asset ? [
-          {
-            url: sanitizeImageUrl(`${post.mainImage.asset._ref}`),
-            alt: post.mainImage.alt ? sanitizeText(post.mainImage.alt) : title
-          }
-        ] : undefined
-      }
-    }
+      url: `/blog/${slug}`,
+      type: 'article',
+      publishedTime: post.publishedAt,
+      modifiedTime: post._updatedAt,
+      author: '荒木弘文',
+      ogImage,
+      ogImageAlt: post.mainImage?.alt ? sanitizeText(post.mainImage.alt) : title,
+      keywords: ['蓮城院', 'ブログ', '副住職', '荒木弘文', '仏教', '曹洞宗', title.split(' ').slice(0, 3)].flat()
+    })
   } catch (error) {
     console.error('Failed to generate metadata:', error)
-    return {
-      title: 'エラーが発生しました | 蓮城院',
-      description: 'ページの読み込み中にエラーが発生しました。'
-    }
+    return generateSEOMetadata({
+      title: 'エラーが発生しました',
+      description: 'ページの読み込み中にエラーが発生しました。',
+      noindex: true
+    })
   }
 }
 
@@ -210,31 +225,13 @@ function formatDate(dateString: string): string {
   }
 }
 
-// JSON-LD構造化データ生成（セキュア版）
-function generateJsonLd(post: BlogPost) {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://renjoin.com'
-
-  const jsonLdData = {
-    '@context': 'https://schema.org',
-    '@type': 'BlogPosting',
-    headline: post.title, // サニタイズは後で実行
-    description: post.excerpt || undefined,
-    author: {
-      '@type': 'Organization',
-      name: '蓮城院'
-    },
-    publisher: {
-      '@type': 'Organization',
-      name: '蓮城院'
-    },
-    datePublished: post.publishedAt,
-    dateModified: post._updatedAt,
-    url: `${baseUrl}/blog/${post.slug.current}`,
-    image: post.mainImage?.asset ? `${post.mainImage.asset._ref}` : undefined
-  }
-
-  // sanitizeJsonLdを使用して全体を安全にサニタイズ
-  return sanitizeJsonLd(jsonLdData)
+// パンくずリスト生成関数
+function generateBreadcrumbs(post: BlogPost) {
+  return [
+    { name: 'ホーム', url: '/' },
+    { name: 'ブログ', url: '/blog' },
+    { name: sanitizeText(post.title), url: `/blog/${post.slug.current}` }
+  ]
 }
 
 // エラーフォールバック用コンポーネント
@@ -289,12 +286,30 @@ export default async function BlogPost({
 
     return (
       <>
-        {/* 構造化データ（セキュア版） */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(generateJsonLd(post))
-          }}
+        {/* Google Analytics ブログ追跡 */}
+        <BlogAnalytics
+          postSlug={post.slug.current}
+          postTitle={sanitizedPost.title}
+          wordCount={post.body ? post.body.length * 2 : 0} // 概算文字数
+        />
+
+        {/* 構造化データ - ブログ記事 */}
+        <StructuredData
+          type="BlogPosting"
+          data={generateBlogPostData({
+            title: sanitizedPost.title,
+            description: sanitizedPost.excerpt || '',
+            publishedAt: post.publishedAt,
+            slug: post.slug.current,
+            author: '荒木弘文',
+            mainImage: post.mainImage?.asset ? sanitizeImageUrl(`${post.mainImage.asset._ref}`) : undefined
+          })}
+        />
+
+        {/* 構造化データ - パンくずリスト */}
+        <StructuredData
+          type="BreadcrumbList"
+          data={generateBreadcrumbData(generateBreadcrumbs(post))}
         />
 
         <article className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">

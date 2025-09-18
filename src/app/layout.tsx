@@ -3,20 +3,29 @@ import { Noto_Serif_JP, Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
+// パフォーマンス最適化：分析コンポーネントを遅延読み込み
+// import { DynamicGoogleAnalytics } from "@/components/utils/DynamicComponents";
+// import { WebVitalsMonitor } from "@/components/common/WebVitalsMonitor";
 
-// 日本語フォントの設定（設計書に基づく）
+// 日本語フォントの最適化設定（パフォーマンス強化版）
 const notoSerifJP = Noto_Serif_JP({
   variable: "--font-serif-jp",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
+  subsets: ["latin"], // 日本語サブセットは必要に応じて遅延読み込み
+  weight: ["400", "600"], // 使用するウェイトのみを指定してファイルサイズを削減
+  display: "swap", // フォント読み込み中はシステムフォントを表示
+  preload: true, // プリロードを有効化
+  fallback: ['serif', 'メイリオ', 'ヒラギノ明朝', 'Hiragino Mincho ProN'], // フォールバックフォントを指定
+  adjustFontFallback: true, // フォールバックフォントの調整を有効化
 });
 
 const notoSansJP = Noto_Sans_JP({
   variable: "--font-sans-jp",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "600"], // 使用するウェイトのみを指定
   display: "swap",
+  preload: true,
+  fallback: ['sans-serif', 'メイリオ', 'ヒラギノ角ゴシック', 'Hiragino Kaku Gothic ProN'],
+  adjustFontFallback: true,
 });
 
 // メタデータ設定（設計書のSEO要件に基づく）
@@ -73,6 +82,12 @@ export default function RootLayout({
   return (
     <html lang="ja" className={`${notoSerifJP.variable} ${notoSansJP.variable}`}>
       <body className="font-sans antialiased bg-bg-primary text-text-primary min-h-screen flex flex-col">
+        {/* Google Analytics（遅延読み込み） - 一時的にコメントアウト */}
+        {/* <DynamicGoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ''} cookieConsent={true} /> */}
+
+        {/* Web Vitalsパフォーマンス監視 - 一時的にコメントアウト */}
+        {/* <WebVitalsMonitor /> */}
+
         {/* ヘッダー */}
         <Header />
 

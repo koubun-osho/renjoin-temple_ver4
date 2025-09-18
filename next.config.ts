@@ -1,5 +1,11 @@
 import type { NextConfig } from "next";
 
+// Bundle Analyzerのインポート
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+  openAnalyzer: true,
+})
+
 /**
  * 蓮城院公式サイト - セキュリティ強化 Next.js設定
  *
@@ -12,6 +18,12 @@ import type { NextConfig } from "next";
  */
 
 const nextConfig: NextConfig = {
+  // 静的サイト生成の設定
+  output: 'standalone',
+  trailingSlash: false,
+
+  // 静的ファイルの最適化
+  assetPrefix: process.env.NODE_ENV === 'production' ? undefined : undefined,
   // セキュリティヘッダーの設定
   async headers() {
     return [
@@ -70,16 +82,10 @@ const nextConfig: NextConfig = {
     ]
   },
 
-  // 開発時のセキュリティ設定
-  experimental: {
-    // セキュリティ関連の実験的機能
-    serverActions: {
-      allowedOrigins: ['localhost:3000', '*.vercel.app', 'renjoin.com']
-    }
-  },
 
-  // 画像最適化の設定
+  // 画像最適化の設定（パフォーマンス強化版）
   images: {
+    // リモート画像パターン
     remotePatterns: [
       {
         protocol: 'https',
@@ -95,9 +101,20 @@ const nextConfig: NextConfig = {
         hostname: 'source.unsplash.com'
       }
     ],
+    // 画像形式の最適化
+    formats: ['image/webp', 'image/avif'],
+    // 画像サイズの最適化
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    // キャッシュ設定
+    minimumCacheTTL: 31536000, // 1年
     // 安全でない画像リクエストを防ぐ
     dangerouslyAllowSVG: false,
-    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;"
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    // 画像最適化のローダー設定
+    loader: 'default',
+    // 未最適化画像の処理
+    unoptimized: false
   },
 
   // TypeScript設定の強化
@@ -115,8 +132,88 @@ const nextConfig: NextConfig = {
   // 本番環境での最適化
   ...(process.env.NODE_ENV === 'production' && {
     poweredByHeader: false, // Powered by Next.jsヘッダーを削除
-    generateEtags: false    // ETagの自動生成を無効化
-  })
+    generateEtags: true,    // ETagの自動生成を有効化（キャッシュ最適化）
+    compress: true,         // gzip圧縮を有効化
+    reactStrictMode: true   // React Strict Modeを有効化
+  }),
+
+  // パフォーマンス最適化設定
+  compiler: {
+    // 本番環境でのコンソールログ除去
+    removeConsole: process.env.NODE_ENV === 'production',
+    // React Compiler（実験的）
+    reactRemoveProperties: process.env.NODE_ENV === 'production' ? { properties: ['^data-testid$'] } : false
+  },
+
+  // Webpack最適化設定
+  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+    // 本番環境の最適化
+    if (!dev && !isServer) {
+      // Tree shakingの強化
+      config.optimization = {
+        ...config.optimization,
+        usedExports: true,
+        sideEffects: false,
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              chunks: 'all',
+            },
+            common: {
+              name: 'common',
+              minChunks: 2,
+              chunks: 'all',
+              enforce: true,
+            },
+            // Sanity関連のコードを分離
+            sanity: {
+              test: /[\\/]node_modules[\\/](@sanity|next-sanity)[\\/]/,
+              name: 'sanity',
+              chunks: 'all',
+            },
+            // React関連のコードを分離
+            react: {
+              test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
+              name: 'react',
+              chunks: 'all',
+            },
+          },
+        },
+      }
+
+      // バンドルサイズの制限
+      config.performance = {
+        ...config.performance,
+        maxAssetSize: 512000, // 512KB
+        maxEntrypointSize: 512000, // 512KB
+      }
+
+      // 未使用コードの除去
+      config.plugins.push(
+        new webpack.DefinePlugin({
+          'process.env.NODE_ENV': JSON.stringify('production'),
+        })
+      )
+    }
+
+    // エイリアスの設定
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': require('path').resolve(__dirname, './src'),
+    }
+
+    return config
+  },
+
+  // 実験的機能
+  experimental: {
+    // ページ間のプリフェッチ最適化
+    optimizePackageImports: ['@sanity/client', '@portabletext/react']
+  }
 };
 
-export default nextConfig;
+// Bundle Analyzerでラップしてエクスポート
+export default withBundleAnalyzer(nextConfig);

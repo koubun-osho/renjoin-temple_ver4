@@ -10,13 +10,19 @@
  */
 
 import { Metadata } from 'next'
-import { notFound } from 'next/navigation'
 import { PortableText } from '@portabletext/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { fetchPages } from '../../../lib/sanity'
 import { sanitizeText } from '../../../lib/sanitize'
+import { generateSEOMetadata, StructuredData, generateBreadcrumbData } from '../../components/common/SEO'
 import type { Page } from '../../../types/sanity'
+
+// ISR設定：年間行事ページは1日ごとに再生成（季節に応じて更新）
+export const revalidate = 86400 // 1日（24時間）
+
+// 静的生成の設定
+export const dynamic = 'force-static'
 
 // ページスラッグの定数
 const PAGE_SLUG = 'events'
@@ -24,28 +30,37 @@ const PAGE_SLUG = 'events'
 /**
  * フォールバック用のページデータ
  */
-const fallbackPageData = {
+const fallbackPageData: Page = {
+  _id: 'fallback-events',
+  _type: 'page',
+  _createdAt: new Date().toISOString(),
+  _updatedAt: new Date().toISOString(),
   title: '年間行事',
+  slug: { current: 'events', _type: 'slug' },
   body: [
     {
+      _key: 'fallback-h2-1',
       _type: 'block',
       style: 'h2',
-      children: [{ _type: 'span', text: '蓮城院の年間行事' }]
+      children: [{ _key: 'fallback-span-1', _type: 'span', text: '蓮城院の年間行事' }]
     },
     {
+      _key: 'fallback-normal-1',
       _type: 'block',
       style: 'normal',
-      children: [{ _type: 'span', text: '蓮城院では一年を通じて様々な法要・行事を執り行っております。詳細な日程については、お知らせページまたはお電話にてお問い合わせください。' }]
+      children: [{ _key: 'fallback-span-2', _type: 'span', text: '蓮城院では一年を通じて様々な法要・行事を執り行っております。詳細な日程については、お知らせページまたはお電話にてお問い合わせください。' }]
     },
     {
+      _key: 'fallback-h2-2',
       _type: 'block',
       style: 'h2',
-      children: [{ _type: 'span', text: '主な年間行事' }]
+      children: [{ _key: 'fallback-span-3', _type: 'span', text: '主な年間行事' }]
     },
     {
+      _key: 'fallback-normal-2',
       _type: 'block',
       style: 'normal',
-      children: [{ _type: 'span', text: '・新年祈祷\n・春彼岸法要\n・花まつり\n・盂蘭盆会\n・秋彼岸法要\n・年末法要' }]
+      children: [{ _key: 'fallback-span-4', _type: 'span', text: '・新年祈祷\n・春彼岸法要\n・花まつり\n・盂蘭盆会\n・秋彼岸法要\n・年末法要' }]
     }
   ],
   metaDescription: '蓮城院の年間行事・法要についてご案内します。'
@@ -72,21 +87,14 @@ export async function generateMetadata(): Promise<Metadata> {
     ? sanitizeText(finalPageData.metaDescription)
     : '蓮城院の年間行事・法要についてご案内します。'
 
-  return {
-    title: `${sanitizedTitle} | 蓮城院`,
+  return generateSEOMetadata({
+    title: sanitizedTitle,
     description: sanitizedDescription,
-    openGraph: {
-      title: `${sanitizedTitle} | 蓮城院`,
-      description: sanitizedDescription,
-      type: 'website',
-      locale: 'ja_JP',
-    },
-    twitter: {
-      card: 'summary',
-      title: `${sanitizedTitle} | 蓮城院`,
-      description: sanitizedDescription,
-    },
-  }
+    url: '/events',
+    type: 'website',
+    keywords: ['蓮城院', '年間行事', '法要', '曹洞宗', '寺院', '祭事'],
+    canonical: '/events'
+  })
 }
 
 /**
@@ -217,6 +225,16 @@ const portableTextComponents = {
 /**
  * 年間行事ページコンポーネント
  */
+/**
+ * パンくずリスト生成関数
+ */
+function generateBreadcrumbs() {
+  return [
+    { name: 'ホーム', url: '/' },
+    { name: '年間行事', url: '/events' }
+  ]
+}
+
 export default async function EventsPage() {
   let pageData: Page | null = null
 
@@ -235,7 +253,14 @@ export default async function EventsPage() {
   const sanitizedTitle = sanitizeText(finalPageData.title)
 
   return (
-    <div className="min-h-screen bg-white">
+    <>
+      {/* 構造化データ - パンくずリスト */}
+      <StructuredData
+        type="BreadcrumbList"
+        data={generateBreadcrumbData(generateBreadcrumbs())}
+      />
+
+      <div className="min-h-screen bg-white">
       {/* ヘッダー部分 */}
       <div className="bg-gradient-to-r from-gray-50 to-amber-50 border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -315,6 +340,7 @@ export default async function EventsPage() {
           </div>
         </div>
       </main>
-    </div>
+      </div>
+    </>
   )
 }

@@ -10,7 +10,6 @@
  */
 
 import { Metadata } from 'next'
-import { notFound } from 'next/navigation'
 import { PortableText } from '@portabletext/react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -18,34 +17,49 @@ import { fetchPages } from '../../../lib/sanity'
 import { sanitizeText } from '../../../lib/sanitize'
 import type { Page } from '../../../types/sanity'
 
+// ISR設定：プライバシーポリシーは1週間ごとに再生成
+export const revalidate = 604800 // 1週間（7日間）
+
+// 静的生成の設定
+export const dynamic = 'force-static'
+
 // ページスラッグの定数
 const PAGE_SLUG = 'privacy'
 
 /**
  * フォールバック用のページデータ
  */
-const fallbackPageData = {
+const fallbackPageData: Page = {
+  _id: 'fallback-privacy',
+  _type: 'page',
+  _createdAt: new Date().toISOString(),
+  _updatedAt: new Date().toISOString(),
   title: 'プライバシーポリシー',
+  slug: { current: 'privacy', _type: 'slug' },
   body: [
     {
+      _key: 'fallback-h2-1',
       _type: 'block',
       style: 'h2',
-      children: [{ _type: 'span', text: '個人情報の収集・利用目的' }]
+      children: [{ _key: 'fallback-span-1', _type: 'span', text: '個人情報の収集・利用目的' }]
     },
     {
+      _key: 'fallback-normal-1',
       _type: 'block',
       style: 'normal',
-      children: [{ _type: 'span', text: '蓮城院では、お問い合わせや法要のお申し込みに際し、適切な対応を行うために必要な個人情報を収集いたします。' }]
+      children: [{ _key: 'fallback-span-2', _type: 'span', text: '蓮城院では、お問い合わせや法要のお申し込みに際し、適切な対応を行うために必要な個人情報を収集いたします。' }]
     },
     {
+      _key: 'fallback-h2-2',
       _type: 'block',
       style: 'h2',
-      children: [{ _type: 'span', text: '個人情報の管理' }]
+      children: [{ _key: 'fallback-span-3', _type: 'span', text: '個人情報の管理' }]
     },
     {
+      _key: 'fallback-normal-2',
       _type: 'block',
       style: 'normal',
-      children: [{ _type: 'span', text: '収集した個人情報は、適切なセキュリティ対策を講じ、第三者への無断提供はいたしません。' }]
+      children: [{ _key: 'fallback-span-4', _type: 'span', text: '収集した個人情報は、適切なセキュリティ対策を講じ、第三者への無断提供はいたしません。' }]
     }
   ],
   metaDescription: '蓮城院公式サイトのプライバシーポリシーです。'

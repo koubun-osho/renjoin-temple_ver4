@@ -1,0 +1,334 @@
+/**
+ * 蓮城院公式サイト - 最適化画像コンポーネント
+ *
+ * Next.js Image最適化機能を最大限に活用したパフォーマンス重視のコンポーネント。
+ * Core Web Vitals向上のためのベストプラクティスを実装。
+ *
+ * @created 2025-09-18
+ * @version 1.0.0 Performance Optimization版
+ * @task P4-04 - パフォーマンス最適化
+ */
+
+import Image, { ImageProps } from 'next/image'
+import { useState, CSSProperties } from 'react'
+
+// ========================
+// 型定義
+// ========================
+
+interface OptimizedImageProps extends Omit<ImageProps, 'placeholder' | 'blurDataURL'> {
+  /**
+   * 画像の用途タイプ
+   * - hero: ヒーロー画像（最高品質、プリロード）
+   * - content: コンテンツ画像（高品質）
+   * - thumbnail: サムネイル画像（圧縮優先）
+   * - background: 背景画像（中品質、遅延読み込み）
+   */
+  imageType?: 'hero' | 'content' | 'thumbnail' | 'background'
+
+  /**
+   * レスポンシブ画像サイズ設定
+   */
+  responsiveSizes?: {
+    mobile?: string
+    tablet?: string
+    desktop?: string
+  }
+
+  /**
+   * ブラー画像を自動生成するかどうか
+   */
+  enableBlur?: boolean
+
+  /**
+   * 遅延読み込みを無効にするかどうか
+   */
+  disableLazyLoading?: boolean
+
+  /**
+   * アスペクト比の維持
+   */
+  aspectRatio?: '16:9' | '4:3' | '1:1' | '3:2' | '2:1' | 'auto'
+
+  /**
+   * エラー時のフォールバック画像
+   */
+  fallbackSrc?: string
+
+  /**
+   * 読み込み中の表示コンテンツ
+   */
+  loadingContent?: React.ReactNode
+}
+
+// ========================
+// 画像設定マップ
+// ========================
+
+const imageTypeConfig = {
+  hero: {
+    quality: 90,
+    priority: true,
+    sizes: '100vw',
+    placeholder: 'blur' as const
+  },
+  content: {
+    quality: 85,
+    priority: false,
+    sizes: '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw',
+    placeholder: 'blur' as const
+  },
+  thumbnail: {
+    quality: 75,
+    priority: false,
+    sizes: '(max-width: 768px) 50vw, 25vw',
+    placeholder: 'blur' as const
+  },
+  background: {
+    quality: 70,
+    priority: false,
+    sizes: '100vw',
+    placeholder: 'blur' as const
+  }
+} as const
+
+// ========================
+// ブラー画像生成関数
+// ========================
+
+/**
+ * 画像サイズに基づいてブラー用のbase64画像を生成
+ */
+const generateBlurDataURL = (width: number, height: number): string => {
+  // シンプルなグラデーションブラー画像
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return ''
+
+  // 和風カラーパレットでグラデーション
+  const gradient = ctx.createLinearGradient(0, 0, width, height)
+  gradient.addColorStop(0, '#f5f5f0') // 和紙色
+  gradient.addColorStop(0.5, '#e8e6df') // 薄墨色
+  gradient.addColorStop(1, '#d4d0c8') // 灰白色
+
+  ctx.fillStyle = gradient
+  ctx.fillRect(0, 0, width, height)
+
+  return canvas.toDataURL('image/jpeg', 0.1)
+}
+
+/**
+ * 軽量な静的ブラー画像（和風カラー）
+ */
+const defaultBlurDataURL = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGBobHB0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
+
+// ========================
+// アスペクト比スタイル
+// ========================
+
+const aspectRatioStyles: Record<string, CSSProperties> = {
+  '16:9': { aspectRatio: '16/9' },
+  '4:3': { aspectRatio: '4/3' },
+  '1:1': { aspectRatio: '1/1' },
+  '3:2': { aspectRatio: '3/2' },
+  '2:1': { aspectRatio: '2/1' },
+  'auto': {}
+}
+
+// ========================
+// メインコンポーネント
+// ========================
+
+/**
+ * 最適化画像コンポーネント
+ * パフォーマンスとUXを両立した画像表示を提供
+ */
+export const OptimizedImage = ({
+  imageType = 'content',
+  responsiveSizes,
+  enableBlur = true,
+  disableLazyLoading = false,
+  aspectRatio = 'auto',
+  fallbackSrc = '/images/fallback.jpg',
+  loadingContent,
+  className = '',
+  style,
+  onError,
+  onLoad,
+  width,
+  height,
+  ...props
+}: OptimizedImageProps) => {
+  const [imageError, setImageError] = useState(false)
+  const [imageLoaded, setImageLoaded] = useState(false)
+
+  // 画像タイプに基づく設定取得
+  const config = imageTypeConfig[imageType]
+
+  // レスポンシブサイズの構築
+  const sizes = responsiveSizes
+    ? `(max-width: 768px) ${responsiveSizes.mobile || '100vw'}, (max-width: 1200px) ${responsiveSizes.tablet || '50vw'}, ${responsiveSizes.desktop || '33vw'}`
+    : config.sizes
+
+  // ブラー画像の設定
+  const blurDataURL = enableBlur ? defaultBlurDataURL : undefined
+
+  // アスペクト比スタイルの適用
+  const aspectStyle = aspectRatio !== 'auto' ? aspectRatioStyles[aspectRatio] : {}
+
+  // 最終的なスタイル
+  const finalStyle: CSSProperties = {
+    ...aspectStyle,
+    ...style
+  }
+
+  // エラーハンドリング
+  const handleError = (error: any) => {
+    setImageError(true)
+    onError?.(error)
+  }
+
+  // 読み込み完了ハンドリング
+  const handleLoad = (event: any) => {
+    setImageLoaded(true)
+    onLoad?.(event)
+  }
+
+  // フォールバック画像表示
+  if (imageError && fallbackSrc) {
+    return (
+      <div className={`relative overflow-hidden ${className}`} style={finalStyle}>
+        <Image
+          {...props}
+          src={fallbackSrc}
+          alt="画像を読み込めませんでした"
+          fill={!width && !height}
+          width={width}
+          height={height}
+          className="object-cover object-center"
+          quality={60}
+        />
+        <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
+          <span className="text-gray-400 text-sm">画像が利用できません</span>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className={`relative overflow-hidden ${className}`} style={finalStyle}>
+      {/* 読み込み中表示 */}
+      {!imageLoaded && loadingContent && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-50">
+          {loadingContent}
+        </div>
+      )}
+
+      {/* メイン画像 */}
+      <Image
+        {...props}
+        fill={!width && !height}
+        width={width}
+        height={height}
+        quality={config.quality}
+        priority={disableLazyLoading || config.priority}
+        sizes={sizes}
+        placeholder={enableBlur ? config.placeholder : 'empty'}
+        blurDataURL={blurDataURL}
+        className={`object-cover object-center transition-opacity duration-300 ${
+          imageLoaded ? 'opacity-100' : 'opacity-0'
+        }`}
+        onError={handleError}
+        onLoad={handleLoad}
+        style={{
+          ...style
+        }}
+      />
+
+      {/* Progressive Enhancement用の追加最適化 */}
+      {imageType === 'hero' && (
+        <>
+          {/* プリロード用のlinkタグ（SSRで処理） */}
+          <link
+            rel="preload"
+            as="image"
+            href={props.src as string}
+            media="(min-width: 768px)"
+          />
+        </>
+      )}
+    </div>
+  )
+}
+
+// ========================
+// 特化型コンポーネント
+// ========================
+
+/**
+ * ヒーロー画像専用コンポーネント
+ */
+export const HeroImage = (props: Omit<OptimizedImageProps, 'imageType'>) => (
+  <OptimizedImage {...props} imageType="hero" disableLazyLoading />
+)
+
+/**
+ * コンテンツ画像専用コンポーネント
+ */
+export const ContentImage = (props: Omit<OptimizedImageProps, 'imageType'>) => (
+  <OptimizedImage {...props} imageType="content" />
+)
+
+/**
+ * サムネイル画像専用コンポーネント
+ */
+export const ThumbnailImage = (props: Omit<OptimizedImageProps, 'imageType'>) => (
+  <OptimizedImage {...props} imageType="thumbnail" />
+)
+
+/**
+ * 背景画像専用コンポーネント
+ */
+export const BackgroundImage = (props: Omit<OptimizedImageProps, 'imageType'>) => (
+  <OptimizedImage {...props} imageType="background" />
+)
+
+// ========================
+// パフォーマンス監視フック
+// ========================
+
+/**
+ * 画像読み込みパフォーマンスを監視するフック
+ */
+export const useImagePerformance = () => {
+  const [metrics, setMetrics] = useState<{
+    loadTime: number
+    size: number
+    format: string
+  } | null>(null)
+
+  const measurePerformance = (imageElement: HTMLImageElement) => {
+    if ('PerformanceObserver' in window) {
+      const observer = new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          if (entry.name === imageElement.src) {
+            setMetrics({
+              loadTime: entry.duration,
+              size: (entry as any).transferSize || 0,
+              format: imageElement.src.split('.').pop() || 'unknown'
+            })
+          }
+        }
+      })
+
+      observer.observe({ entryTypes: ['resource'] })
+    }
+  }
+
+  return { metrics, measurePerformance }
+}
+
+export default OptimizedImage

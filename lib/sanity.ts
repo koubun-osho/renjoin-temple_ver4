@@ -11,9 +11,15 @@
 import { createClient } from '@sanity/client'
 
 // 環境変数の型安全性を確保
-const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!
-const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET!
+const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'demo-project'
+const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production'
 const apiVersion = process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-01-16'
+
+// Sanity設定が不完全かどうかをチェック
+const isSanityConfigured = !!(
+  process.env.NEXT_PUBLIC_SANITY_PROJECT_ID &&
+  process.env.NEXT_PUBLIC_SANITY_DATASET
+)
 
 /**
  * 本番用 Sanity クライアント
@@ -43,6 +49,11 @@ export const previewClient = createClient({
  * プレビューモードに応じて適切なクライアントを返却
  */
 export const getClient = (preview?: boolean) => (preview ? previewClient : client)
+
+/**
+ * Sanity設定状況のエクスポート
+ */
+export { isSanityConfigured }
 
 /**
  * 設定値の確認
@@ -119,7 +130,16 @@ export const blogQueries = {
   count: `count(*[_type == "blog"])`,
 
   // 静的パス生成用スラッグ一覧
-  slugs: `*[_type == "blog"]{slug}`
+  slugs: `*[_type == "blog"]{slug}`,
+
+  // サイトマップ用データ取得
+  sitemap: `
+    *[_type == "blog"] | order(publishedAt desc) {
+      slug,
+      publishedAt,
+      _updatedAt
+    }
+  `
 } as const
 
 /**
@@ -178,7 +198,16 @@ export const newsQueries = {
   countByCategory: `count(*[_type == "news" && category == $category])`,
 
   // 静的パス生成用スラッグ一覧
-  slugs: `*[_type == "news"]{slug}`
+  slugs: `*[_type == "news"]{slug}`,
+
+  // サイトマップ用データ取得
+  sitemap: `
+    *[_type == "news"] | order(publishedAt desc) {
+      slug,
+      publishedAt,
+      _updatedAt
+    }
+  `
 } as const
 
 /**
@@ -324,6 +353,18 @@ export const fetchBlogPosts = {
       console.error('Failed to fetch blog post slugs:', error)
       throw new Error('ブログ記事スラッグの取得に失敗しました')
     }
+  },
+
+  /**
+   * サイトマップ用のブログ記事データを取得
+   */
+  async sitemap(): Promise<Array<{ slug: { current: string }; publishedAt: string; _updatedAt: string }>> {
+    try {
+      return await client.fetch(blogQueries.sitemap)
+    } catch (error) {
+      console.error('Failed to fetch blog posts for sitemap:', error)
+      return []
+    }
   }
 }
 
@@ -403,6 +444,18 @@ export const fetchNews = {
     } catch (error) {
       console.error('Failed to fetch news slugs:', error)
       throw new Error('お知らせスラッグの取得に失敗しました')
+    }
+  },
+
+  /**
+   * サイトマップ用のお知らせデータを取得
+   */
+  async sitemap(): Promise<Array<{ slug: { current: string }; publishedAt: string; _updatedAt: string }>> {
+    try {
+      return await client.fetch(newsQueries.sitemap)
+    } catch (error) {
+      console.error('Failed to fetch news for sitemap:', error)
+      return []
     }
   }
 }

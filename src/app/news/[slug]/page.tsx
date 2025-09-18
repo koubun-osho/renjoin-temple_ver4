@@ -15,15 +15,28 @@ import Link from 'next/link'
 import { PortableText, PortableTextComponents } from '@portabletext/react'
 import type { TypedObject } from '@portabletext/types'
 import { fetchNews } from '../../../../lib/sanity'
-import { sanitizeText, sanitizeUrl, sanitizePortableText, sanitizeJsonLd } from '../../../../lib/sanitize'
+import { sanitizeText, sanitizeUrl, sanitizePortableText } from '../../../../lib/sanitize'
+import { generateSEOMetadata, StructuredData, generateBreadcrumbData } from '../../../components/common/SEO'
 import type { NewsItem } from '../../../../types/sanity'
 
-// 静的パス生成
+// ISR設定：お知らせは30分ごとに再生成（更新頻度が高いため）
+export const revalidate = 1800 // 30分（1800秒）
+
+// 動的ルートの設定
+export const dynamic = 'force-static'
+export const dynamicParams = true
+
+// 静的パス生成（パフォーマンス最適化版）
 export async function generateStaticParams() {
   try {
     const slugs = await fetchNews.slugs()
 
-    return slugs.map((item) => ({
+    // 本番環境では最初の30件のみビルド時に生成（お知らせは更新が多いため）
+    const limitedSlugs = process.env.NODE_ENV === 'production'
+      ? slugs.slice(0, 30)
+      : slugs
+
+    return limitedSlugs.map((item) => ({
       slug: item.slug.current
     }))
   } catch (error) {
@@ -43,39 +56,34 @@ export async function generateMetadata({
     const news = await fetchNews.detail(slug)
 
     if (!news) {
-      return {
-        title: 'ページが見つかりません | 蓮城院',
-        description: '指定されたお知らせが見つかりませんでした。'
-      }
+      return generateSEOMetadata({
+        title: 'ページが見つかりません',
+        description: '指定されたお知らせが見つかりませんでした。',
+        noindex: true
+      })
     }
 
     const title = sanitizeText(news.title)
     const description = `蓮城院からのお知らせ: ${title}`
+    const categoryLabel = getCategoryLabel(news.category)
 
-    return {
-      title: `${title} | 蓮城院`,
+    return generateSEOMetadata({
+      title,
       description,
-      openGraph: {
-        title,
-        description,
-        type: 'article',
-        publishedTime: news.publishedAt,
-      },
-      twitter: {
-        card: 'summary',
-        title,
-        description,
-      },
-      alternates: {
-        canonical: `/news/${slug}`,
-      }
-    }
+      url: `/news/${slug}`,
+      type: 'article',
+      publishedTime: news.publishedAt,
+      modifiedTime: news._updatedAt,
+      keywords: ['蓮城院', 'お知らせ', categoryLabel, title.split(' ').slice(0, 3)].flat(),
+      canonical: `/news/${slug}`
+    })
   } catch (error) {
     console.error('Failed to generate metadata:', error)
-    return {
-      title: 'エラーが発生しました | 蓮城院',
-      description: 'ページの読み込み中にエラーが発生しました。'
-    }
+    return generateSEOMetadata({
+      title: 'エラーが発生しました',
+      description: 'ページの読み込み中にエラーが発生しました。',
+      noindex: true
+    })
   }
 }
 
@@ -191,30 +199,40 @@ function getCategoryLabel(category: string): string {
   return categoryMap[category] || category
 }
 
-// JSON-LD構造化データ生成（セキュア版）
-function generateJsonLd(news: NewsItem) {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://renjoin.com'
+// パンくずリスト生成関数
+function generateBreadcrumbs(news: NewsItem) {
+  return [
+    { name: 'ホーム', url: '/' },
+    { name: 'お知らせ', url: '/news' },
+    { name: sanitizeText(news.title), url: `/news/${news.slug.current}` }
+  ]
+}
 
-  const jsonLdData = {
-    '@context': 'https://schema.org',
-    '@type': 'Article',
-    headline: news.title, // サニタイズは後で実行
+// 記事構造化データ生成関数
+function generateArticleData(news: NewsItem) {
+  return {
+    headline: sanitizeText(news.title),
     author: {
       '@type': 'Organization',
       name: '蓮城院'
     },
     publisher: {
       '@type': 'Organization',
-      name: '蓮城院'
+      name: '蓮城院',
+      logo: {
+        '@type': 'ImageObject',
+        url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://renjoin.temple'}/images/og-image.jpg`
+      }
     },
     datePublished: news.publishedAt,
     dateModified: news._updatedAt,
-    url: `${baseUrl}/news/${news.slug.current}`,
-    articleSection: news.category
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': `${process.env.NEXT_PUBLIC_SITE_URL || 'https://renjoin.temple'}/news/${news.slug.current}`
+    },
+    articleSection: getCategoryLabel(news.category),
+    inLanguage: 'ja-JP'
   }
-
-  // sanitizeJsonLdを使用して全体を安全にサニタイズ
-  return sanitizeJsonLd(jsonLdData)
 }
 
 // エラーフォールバック用コンポーネント
@@ -264,12 +282,16 @@ export default async function NewsDetail({
 
     return (
       <>
-        {/* 構造化データ（セキュア版） */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(generateJsonLd(news))
-          }}
+        {/* 構造化データ - 記事 */}
+        <StructuredData
+          type="Article"
+          data={generateArticleData(news)}
+        />
+
+        {/* 構造化データ - パンくずリスト */}
+        <StructuredData
+          type="BreadcrumbList"
+          data={generateBreadcrumbData(generateBreadcrumbs(news))}
         />
 
         <article className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">

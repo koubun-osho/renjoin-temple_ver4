@@ -16,6 +16,12 @@ import { NewsCard, CardGrid } from '../../components/ui/Card'
 import { fetchNews, createPagination } from '../../../lib/sanity'
 import { NewsItemPreview } from '../../../types/sanity'
 
+// ISR設定：お知らせ一覧は15分ごとに再生成（更新頻度が高いため）
+export const revalidate = 900 // 15分（900秒）
+
+// 静的生成の設定
+export const dynamic = 'force-static'
+
 // ========================
 // ページ設定
 // ========================

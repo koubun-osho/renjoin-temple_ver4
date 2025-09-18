@@ -16,6 +16,12 @@ import { BlogCard, CardGrid } from '../../components/ui/Card'
 import { fetchBlogPosts, createPagination } from '../../../lib/sanity'
 import { BlogPostPreview } from '../../../types/sanity'
 
+// ISR設定：ブログ一覧は30分ごとに再生成
+export const revalidate = 1800 // 30分（1800秒）
+
+// 静的生成の設定
+export const dynamic = 'force-static'
+
 // ========================
 // ページ設定
 // ========================
