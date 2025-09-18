@@ -8,7 +8,8 @@ import { HeroSection } from '../components/sections/HeroSection'
 import { BlogCard, NewsCard, CardGrid, CardSkeleton } from '../components/ui/Card'
 
 // パフォーマンス最適化：ファーストビューでないコンポーネントを遅延読み込み
-import { DynamicAboutSection, DynamicAccessSection } from '../components/utils/DynamicComponents'
+import { AccessSection } from '../components/sections/AccessSection'
+import { AboutSection } from '../components/sections/AboutSection'
 
 // 型定義のインポート
 import type { HomePageData } from '../../types/sanity'
@@ -112,11 +113,33 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 由緒セクション（遅延読み込み） */}
-      <DynamicAboutSection />
+      {/* 由緒セクション */}
+      <AboutSection />
 
-      {/* アクセスセクション（遅延読み込み） */}
-      <DynamicAccessSection />
+      {/* アクセスセクション */}
+      <AccessSection
+        address={{
+          postal: '〒321-4502',
+          prefecture: '栃木県',
+          city: '真岡市',
+          street: '物井102',
+        }}
+        phone="0285-75-0401"
+        email="koubun0218@gmail.com"
+        transportation={[
+          {
+            type: 'train',
+            description: 'JR宇都宮線「石橋駅」より車で約15分',
+            time: '車で15分'
+          },
+          {
+            type: 'car',
+            description: '北関東自動車道「真岡IC」より約10分',
+            time: '車で10分'
+          }
+        ]}
+        parkingInfo="境内に無料駐車場をご用意しております。"
+      />
     </div>
   )
 }

@@ -284,8 +284,8 @@ export default async function ContactPage() {
               <div className="space-y-3">
                 <div>
                   <p className="text-2xl font-bold text-amber-700 mb-1">
-                    <a href="tel:03-1234-5678" className="hover:text-amber-800 transition-colors">
-                      03-1234-5678
+                    <a href="tel:0285-75-0401" className="hover:text-amber-800 transition-colors">
+                      0285-75-0401
                     </a>
                   </p>
                   <p className="text-sm text-gray-600">
@@ -310,8 +310,8 @@ export default async function ContactPage() {
               <div className="space-y-3">
                 <div>
                   <p className="text-lg font-medium text-amber-700 mb-1">
-                    <a href="mailto:info@renjoin.temple" className="hover:text-amber-800 transition-colors">
-                      info@renjoin.temple
+                    <a href="mailto:koubun0218@gmail.com" className="hover:text-amber-800 transition-colors">
+                      koubun0218@gmail.com
                     </a>
                   </p>
                   <p className="text-sm text-gray-600">

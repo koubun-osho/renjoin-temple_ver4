@@ -177,8 +177,8 @@ export const measureFontLoadTime = () => {
   if (typeof window === 'undefined' || !window.performance) return
 
   const startTime = performance.now()
-  let fontsLoaded = 0
-  const totalFonts = fontOptimizationConfig.critical.length
+  // const fontsLoaded = 0
+  // const totalFonts = fontOptimizationConfig.critical.length
 
   const checkFontsLoaded = () => {
     if (document.fonts.ready) {
@@ -190,7 +190,7 @@ export const measureFontLoadTime = () => {
         if (window.gtag) {
           window.gtag('event', 'font_load_time', {
             load_time: Math.round(loadTime),
-            fonts_count: totalFonts,
+            fonts_count: fontOptimizationConfig.critical.length,
             event_category: 'Performance'
           })
         }
@@ -201,7 +201,7 @@ export const measureFontLoadTime = () => {
   }
 
   // フォント読み込み完了を監視
-  if (document.fonts.ready) {
+  if (document.fonts) {
     checkFontsLoaded()
   } else {
     // フォールバック：タイムアウト付きでチェック
