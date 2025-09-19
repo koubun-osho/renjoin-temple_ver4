@@ -81,12 +81,28 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja" className={`${notoSerifJP.variable} ${notoSansJP.variable}`}>
+      <head>
+        {/* Google Analytics */}
+        {process.env.NEXT_PUBLIC_GA_TRACKING_ID && (
+          <>
+            <script
+              async
+              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_TRACKING_ID}`}
+            />
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${process.env.NEXT_PUBLIC_GA_TRACKING_ID}');
+                `,
+              }}
+            />
+          </>
+        )}
+      </head>
       <body className="font-sans antialiased bg-bg-primary text-text-primary min-h-screen flex flex-col">
-        {/* Google Analytics（遅延読み込み） - 一時的にコメントアウト */}
-        {/* <DynamicGoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ''} cookieConsent={true} /> */}
-
-        {/* Web Vitalsパフォーマンス監視 - 一時的にコメントアウト */}
-        {/* <WebVitalsMonitor /> */}
 
         {/* ヘッダー */}
         <Header />
