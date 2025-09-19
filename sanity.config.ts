@@ -16,13 +16,13 @@ export default defineConfig({
   title: '蓮城院 CMS｜コンテンツ管理システム',
   subtitle: '蓮城院公式サイトのコンテンツを管理します',
 
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
+  projectId: 'vbwerzmy',
+  dataset: 'production',
 
   // API設定とセキュリティ
   api: {
-    projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
-    dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
+    projectId: 'vbwerzmy',
+    dataset: 'production',
     // 本番環境ではCDNを使用
     useCdn: process.env.NODE_ENV === 'production',
     // APIバージョンを固定してセキュリティ向上
@@ -40,19 +40,23 @@ export default defineConfig({
       structure: (S) =>
         S.list()
           .title('コンテンツ一覧')
+          .id('content-list')
           .items([
             // ブログ記事
             S.documentTypeListItem('blog')
+              .id('blog')
               .title('ブログ記事')
               .icon(() => '📝'),
 
             // お知らせ
             S.documentTypeListItem('news')
+              .id('news')
               .title('お知らせ')
               .icon(() => '📢'),
 
             // 固定ページ
             S.documentTypeListItem('page')
+              .id('page')
               .title('固定ページ')
               .icon(() => '📄'),
           ]),
@@ -151,9 +155,9 @@ export default defineConfig({
   },
 
   // プレビュー設定（Next.jsと連携）
-  productionUrl: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+  productionUrl: 'https://www.renjyo-in.com',
   previewUrl: {
-    origin: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+    origin: 'https://www.renjyo-in.com',
     previewMode: {
       enable: '/api/preview',
     },
