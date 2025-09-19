@@ -11,9 +11,9 @@
 import { createClient } from '@sanity/client'
 
 // 環境変数の型安全性を確保
-const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'demo-project'
+const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'vbwerzmy'
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production'
-const apiVersion = process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-01-16'
+const apiVersion = process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2025-09-16'
 
 // Sanity設定が不完全かどうかをチェック
 const isSanityConfigured = !!(
