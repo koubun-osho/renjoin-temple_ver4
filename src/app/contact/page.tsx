@@ -310,8 +310,8 @@ export default async function ContactPage() {
               <div className="space-y-3">
                 <div>
                   <p className="text-lg font-medium text-amber-700 mb-1">
-                    <a href="mailto:koubun0218@gmail.com" className="hover:text-amber-800 transition-colors">
-                      koubun0218@gmail.com
+                    <a href="mailto:info@renjyo-in.com" className="hover:text-amber-800 transition-colors">
+                      info@renjyo-in.com
                     </a>
                   </p>
                   <p className="text-sm text-gray-600">
