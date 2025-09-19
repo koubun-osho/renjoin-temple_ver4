@@ -16,7 +16,7 @@ import { PortableText, PortableTextComponents } from '@portabletext/react'
 import type { TypedObject } from '@portabletext/types'
 import { fetchNews } from '../../../../lib/sanity'
 import ShareButton from '@/components/blog/ShareButton'
-import { sanitizeText, sanitizeUrl, sanitizePortableText } from '../../../../lib/sanitize'
+import { sanitizeText, sanitizeUrl } from '../../../../lib/sanitize'
 import { generateSEOMetadata, StructuredData, generateBreadcrumbData } from '../../../components/common/SEO'
 import type { NewsItem } from '../../../../types/sanity'
 
@@ -278,7 +278,7 @@ export default async function NewsDetail({
     const sanitizedNews = {
       ...news,
       title: sanitizeText(news.title),
-      content: sanitizePortableText(news.content)
+      content: news.content // PortableTextはそのまま使用（コンポーネント内でサニタイズ）
     }
 
     return (

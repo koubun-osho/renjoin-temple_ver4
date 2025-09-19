@@ -20,7 +20,7 @@ import type { TypedObject } from '@portabletext/types'
 import { fetchBlogPosts } from '../../../../lib/sanity'
 import BlogAnalytics from '@/components/blog/BlogAnalytics'
 import ShareButton from '@/components/blog/ShareButton'
-import { sanitizeText, sanitizeUrl, sanitizeImageUrl, sanitizePortableText } from '../../../../lib/sanitize'
+import { sanitizeText, sanitizeUrl, sanitizeImageUrl } from '../../../../lib/sanitize'
 import { generateSEOMetadata, StructuredData, generateBlogPostData, generateBreadcrumbData } from '../../../components/common/SEO'
 import type { BlogPost } from '../../../../types/sanity'
 
@@ -278,7 +278,7 @@ export default async function BlogPost({
       ...post,
       title: sanitizeText(post.title),
       excerpt: post.excerpt ? sanitizeText(post.excerpt) : undefined,
-      body: sanitizePortableText(post.body),
+      body: post.body, // PortableTextはそのまま使用（コンポーネント内でサニタイズ）
       mainImage: post.mainImage ? {
         ...post.mainImage,
         alt: post.mainImage.alt ? sanitizeText(post.mainImage.alt) : undefined
