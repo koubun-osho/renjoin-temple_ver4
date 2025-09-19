@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 // Bundle Analyzerのインポート
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
+import bundleAnalyzer from '@next/bundle-analyzer'
+
+const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
   openAnalyzer: true,
 })
@@ -146,7 +148,7 @@ const nextConfig: NextConfig = {
   },
 
   // Webpack最適化設定
-  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+  webpack: (config, { dev, isServer, webpack }) => {
     // 本番環境の最適化
     if (!dev && !isServer) {
       // Tree shakingの強化
@@ -202,7 +204,7 @@ const nextConfig: NextConfig = {
     // エイリアスの設定
     config.resolve.alias = {
       ...config.resolve.alias,
-      '@': require('path').resolve(__dirname, './src'),
+      '@': new URL('./src', import.meta.url).pathname,
     }
 
     return config
