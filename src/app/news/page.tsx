@@ -13,6 +13,7 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { NewsCard, CardGrid } from '../../components/ui/Card'
+import ReloadButton from '../../components/ui/ReloadButton'
 import { fetchNews, createPagination } from '../../../lib/sanity'
 import { NewsItemPreview } from '../../../types/sanity'
 
@@ -72,15 +73,17 @@ export default async function NewsPage({ searchParams }: NewsPageProps) {
   const currentPage = Math.max(1, parseInt(page || '1', 10))
 
   try {
+    // まず総数を取得
+    const totalCount = await fetchNews.count()
+
+    // ページネーションデータの計算
+    const paginationData = createPagination(currentPage, totalCount, NEWS_PER_PAGE)
+
     // お知らせデータの取得
-    const paginationData = createPagination(currentPage, 0, NEWS_PER_PAGE)
-    const [news, totalCount] = await Promise.all([
-      fetchNews.list({
-        start: paginationData.start,
-        end: paginationData.end
-      }),
-      fetchNews.count()
-    ])
+    const news = await fetchNews.list({
+      start: paginationData.start,
+      end: paginationData.end
+    })
 
     // ページネーション情報の再計算
     const pagination = createPagination(currentPage, totalCount, NEWS_PER_PAGE)
@@ -399,12 +402,11 @@ function ErrorState() {
         </p>
 
         {/* 再読み込みボタン */}
-        <button
-          onClick={() => window.location.reload()}
+        <ReloadButton
           className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-amber-600 hover:bg-amber-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
         >
           ページを再読み込み
-        </button>
+        </ReloadButton>
       </div>
     </div>
   )

@@ -15,6 +15,7 @@ import Link from 'next/link'
 import { PortableText, PortableTextComponents } from '@portabletext/react'
 import type { TypedObject } from '@portabletext/types'
 import { fetchNews } from '../../../../lib/sanity'
+import ShareButton from '@/components/blog/ShareButton'
 import { sanitizeText, sanitizeUrl, sanitizePortableText } from '../../../../lib/sanitize'
 import { generateSEOMetadata, StructuredData, generateBreadcrumbData } from '../../../components/common/SEO'
 import type { NewsItem } from '../../../../types/sanity'
@@ -365,22 +366,7 @@ export default async function NewsDetail({
 
                   {/* シェアボタン */}
                   <div className="flex gap-3">
-                    <button
-                      onClick={() => {
-                        if (navigator.share) {
-                          navigator.share({
-                            title: sanitizedNews.title,
-                            url: window.location.href
-                          })
-                        }
-                      }}
-                      className="p-2 text-gray-600 hover:text-amber-600 transition-colors duration-200"
-                      aria-label="お知らせをシェア"
-                    >
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" />
-                      </svg>
-                    </button>
+                    <ShareButton title={sanitizedNews.title} />
                   </div>
                 </div>
 

@@ -13,6 +13,7 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { BlogCard, CardGrid } from '../../components/ui/Card'
+import ReloadButton from '../../components/ui/ReloadButton'
 import { fetchBlogPosts, createPagination } from '../../../lib/sanity'
 import { BlogPostPreview } from '../../../types/sanity'
 
@@ -399,12 +400,11 @@ function ErrorState() {
         </p>
 
         {/* 再読み込みボタン */}
-        <button
-          onClick={() => window.location.reload()}
+        <ReloadButton
           className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-amber-600 hover:bg-amber-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
         >
           ページを再読み込み
-        </button>
+        </ReloadButton>
       </div>
     </div>
   )
