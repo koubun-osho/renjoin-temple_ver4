@@ -35,12 +35,8 @@ const nextConfig: NextConfig = {
   // リダイレクト設定（多言語対応）
   async redirects() {
     return [
-      // ルートパスから日本語へのリダイレクト
-      {
-        source: '/',
-        destination: '/ja',
-        permanent: false,
-      },
+      // next-intlの'as-needed'設定によりデフォルトロケールのリダイレクトは不要
+      // リダイレクトループを防ぐため一時的に無効化
     ]
   },
   // セキュリティヘッダーの設定

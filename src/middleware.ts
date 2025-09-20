@@ -67,7 +67,7 @@ function getCacheControl(pathname: string): string {
 const intlMiddleware = createIntlMiddleware({
   locales,
   defaultLocale,
-  localePrefix: 'as-needed',
+  localePrefix: 'always', // リダイレクトループを防ぐため一時的に'always'に変更
   localeDetection: true
 })
 
@@ -144,9 +144,8 @@ export const config = {
   matcher: [
     /*
      * 国際化とセキュリティヘッダーを適用するパス
-     * Next.js 15 + next-intl対応
+     * Next.js 15 + next-intl対応（緊急修正版）
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)',
-    '/(ja|en)/:path*'
+    '/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)'
   ],
 }
