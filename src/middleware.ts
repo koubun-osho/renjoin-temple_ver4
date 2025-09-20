@@ -79,6 +79,11 @@ export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
   try {
+    // 404.htmlは直接通す（Vercelの404ハンドリングのため）
+    if (pathname === '/404.html') {
+      return NextResponse.next()
+    }
+
     // 静的ファイルやAPI以外のパスに対して国際化ミドルウェアを適用
     if (
       !pathname.startsWith('/_next') &&
@@ -145,7 +150,8 @@ export const config = {
     /*
      * 国際化とセキュリティヘッダーを適用するパス
      * Next.js 15 + next-intl対応（緊急修正版）
+     * 404.htmlを除外してVercelの404ハンドリングを有効化
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)'
+    '/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|404.html).*)'
   ],
 }
