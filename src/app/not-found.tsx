@@ -8,6 +8,7 @@
  * @version 1.5.0 - aタグ直接版
  */
 
+/* eslint-disable @next/next/no-html-link-for-pages */
 export default function GlobalNotFound() {
   return (
     <div
