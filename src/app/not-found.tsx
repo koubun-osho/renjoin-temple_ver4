@@ -2,126 +2,108 @@
  * 蓮城院公式サイト - グローバル404ページ
  *
  * ルートレベルのnot-foundページ（多言語対応）
- * Client Componentとして実装
+ * Server Component（完全HTML版）
  *
  * @created 2025-09-20
- * @version 1.6.0 - Client Component版
+ * @version 2.0.0 - Server Component版（JavaScript不要）
  */
-
-'use client'
 
 /* eslint-disable @next/next/no-html-link-for-pages */
 export default function GlobalNotFound() {
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontFamily: "'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Yu Gothic Medium', 'Meiryo', sans-serif"
-      }}
-    >
-      <div
-        style={{
-          textAlign: 'center',
-          maxWidth: '480px',
-          margin: '0 auto',
-          padding: '2rem',
-          background: 'white',
-          borderRadius: '16px',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
-        }}
-      >
-        <h1
-          style={{
-            fontSize: '4rem',
-            fontWeight: 'bold',
-            color: '#dc2626',
-            marginBottom: '1rem'
-          }}
-        >
-          404
-        </h1>
-        <h2
-          style={{
-            fontSize: '1.5rem',
-            fontWeight: '600',
-            marginBottom: '1rem',
-            color: '#1f2937'
-          }}
-        >
-          ページが見つかりません
-        </h2>
-        <p
-          style={{
-            color: '#6b7280',
-            marginBottom: '2rem',
-            lineHeight: '1.6'
-          }}
-        >
-          お探しのページは存在しないか、移動された可能性があります。
-        </p>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '1rem'
-          }}
-        >
-          <a
-            href="/ja"
-            style={{
-              background: '#1e40af',
-              color: 'white',
-              padding: '12px 24px',
-              borderRadius: '8px',
-              border: 'none',
-              fontSize: '16px',
-              fontWeight: '500',
-              cursor: 'pointer',
-              textDecoration: 'none',
-              display: 'block',
-              textAlign: 'center',
-              transition: 'background-color 0.2s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = '#1d4ed8'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = '#1e40af'
-            }}
-          >
-            日本語サイトへ
-          </a>
-          <a
-            href="/en"
-            style={{
-              background: '#1e40af',
-              color: 'white',
-              padding: '12px 24px',
-              borderRadius: '8px',
-              border: 'none',
-              fontSize: '16px',
-              fontWeight: '500',
-              cursor: 'pointer',
-              textDecoration: 'none',
-              display: 'block',
-              textAlign: 'center',
-              transition: 'background-color 0.2s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = '#1d4ed8'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = '#1e40af'
-            }}
-          >
-            English Site
-          </a>
+    <html lang="ja">
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>404 - ページが見つかりません | 蓮城院</title>
+        <style dangerouslySetInnerHTML={{
+          __html: `
+            * {
+              margin: 0;
+              padding: 0;
+              box-sizing: border-box;
+            }
+
+            body {
+              font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Yu Gothic Medium', 'Meiryo', sans-serif;
+              background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+              min-height: 100vh;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+
+            .container {
+              text-align: center;
+              max-width: 480px;
+              margin: 0 auto;
+              padding: 2rem;
+              background: white;
+              border-radius: 16px;
+              box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            }
+
+            .error-code {
+              font-size: 4rem;
+              font-weight: bold;
+              color: #dc2626;
+              margin-bottom: 1rem;
+            }
+
+            .title {
+              font-size: 1.5rem;
+              font-weight: 600;
+              margin-bottom: 1rem;
+              color: #1f2937;
+            }
+
+            .description {
+              color: #6b7280;
+              margin-bottom: 2rem;
+              line-height: 1.6;
+            }
+
+            .links {
+              display: flex;
+              flex-direction: column;
+              gap: 1rem;
+            }
+
+            .link {
+              background: #1e40af;
+              color: white;
+              padding: 12px 24px;
+              border-radius: 8px;
+              text-decoration: none;
+              display: block;
+              text-align: center;
+              font-weight: 500;
+              transition: background-color 0.2s ease;
+            }
+
+            .link:hover {
+              background: #1d4ed8;
+            }
+          `
+        }} />
+      </head>
+      <body>
+        <div className="container">
+          <h1 className="error-code">404</h1>
+          <h2 className="title">ページが見つかりません</h2>
+          <p className="description">
+            お探しのページは存在しないか、移動された可能性があります。
+          </p>
+          <div className="links">
+            <a href="/ja" className="link">
+              日本語サイトへ
+            </a>
+            <a href="/en" className="link">
+              English Site
+            </a>
+          </div>
         </div>
-      </div>
-    </div>
+      </body>
+    </html>
   )
 }
