@@ -2,11 +2,13 @@
  * 蓮城院公式サイト - グローバル404ページ
  *
  * ルートレベルのnot-foundページ（多言語対応）
- * aタグを使用した直接リンク
+ * Client Componentとして実装
  *
  * @created 2025-09-20
- * @version 1.5.0 - aタグ直接版
+ * @version 1.6.0 - Client Component版
  */
+
+'use client'
 
 /* eslint-disable @next/next/no-html-link-for-pages */
 export default function GlobalNotFound() {
