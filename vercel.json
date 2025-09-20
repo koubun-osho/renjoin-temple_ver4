@@ -37,14 +37,7 @@
       "destination": "/api/$1"
     }
   ],
-  "routes": [
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "status": 404,
-      "dest": "/404.html"
-    }
-  ]
+  "error": {
+    "404": "/404.html"
+  }
 }

@@ -29,17 +29,6 @@ const nextConfig: NextConfig = {
   output: 'standalone',
   trailingSlash: false,
 
-  // カスタム404ページの設定
-  async rewrites() {
-    return {
-      fallback: [
-        {
-          source: '/:path*',
-          destination: '/404.html',
-        },
-      ],
-    }
-  },
 
   // 静的ファイルの最適化
   assetPrefix: process.env.NODE_ENV === 'production' ? undefined : undefined,
