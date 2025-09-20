@@ -1,0 +1,134 @@
+{
+  "navigation": {
+    "home": "Home",
+    "about": "About Temple",
+    "news": "News",
+    "blog": "Blog",
+    "events": "Events",
+    "contact": "Contact",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "readMore": "Read More",
+    "backToTop": "Back to Top",
+    "close": "Close",
+    "open": "Open",
+    "menu": "Menu",
+    "search": "Search",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "previous": "Previous",
+    "next": "Next",
+    "share": "Share",
+    "print": "Print",
+    "download": "Download"
+  },
+  "hero": {
+    "title": "Welcome to Renjoin Temple",
+    "subtitle": "Walking together with peace of mind",
+    "description": "Find inner peace and tranquility in our serene space, away from the hustle and bustle of daily life.",
+    "exploreMore": "Learn More"
+  },
+  "about": {
+    "title": "About Renjoin Temple",
+    "subtitle": "Inheriting history and tradition",
+    "history": "History",
+    "teachings": "Teachings",
+    "facilities": "Facilities"
+  },
+  "news": {
+    "title": "News",
+    "subtitle": "Latest updates and announcements",
+    "noNews": "No news available at the moment",
+    "publishedOn": "Published on"
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "Daily insights and learning",
+    "noBlog": "No blog posts available at the moment",
+    "categories": "Categories",
+    "tags": "Tags",
+    "relatedPosts": "Related Posts"
+  },
+  "events": {
+    "title": "Events",
+    "subtitle": "Buddhist ceremonies and gatherings",
+    "upcoming": "Upcoming Events",
+    "past": "Past Events",
+    "noEvents": "No events scheduled at the moment",
+    "eventDate": "Event Date",
+    "eventTime": "Event Time",
+    "eventLocation": "Location",
+    "eventDescription": "Event Description"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "Feel free to reach out to us",
+    "form": {
+      "name": "Name",
+      "nameRequired": "Name is required",
+      "email": "Email Address",
+      "emailRequired": "Email address is required",
+      "emailInvalid": "Please enter a valid email address",
+      "subject": "Subject",
+      "subjectRequired": "Subject is required",
+      "message": "Message",
+      "messageRequired": "Message is required",
+      "submit": "Send Message",
+      "submitting": "Sending...",
+      "success": "Thank you for your message. We have received your inquiry.",
+      "error": "Failed to send message. Please try again later."
+    },
+    "info": {
+      "address": "Address",
+      "phone": "Phone",
+      "email": "Email",
+      "hours": "Office Hours",
+      "access": "Access"
+    }
+  },
+  "footer": {
+    "copyright": "© 2025 Renjoin Temple. All rights reserved.",
+    "links": {
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "sitemap": "Sitemap"
+    },
+    "social": {
+      "follow": "Follow Us"
+    }
+  },
+  "language": {
+    "switchTo": "Switch Language",
+    "japanese": "日本語",
+    "english": "English"
+  },
+  "seo": {
+    "title": "Renjoin Temple - Walking together with peace of mind",
+    "description": "Renjoin Temple is a place for those seeking inner peace and spiritual growth. Learn meditation and Buddhist teachings in a serene environment, finding inner peace away from daily distractions.",
+    "keywords": "Renjoin Temple, Temple, Buddhism, Meditation, Inner Peace, Spiritual Growth, Buddhist Teachings"
+  },
+  "accessibility": {
+    "skipToContent": "Skip to content",
+    "backToTop": "Back to top of page",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "openModal": "Open modal",
+    "closeModal": "Close modal"
+  },
+  "notFound": {
+    "title": "Page Not Found",
+    "description": "The page you are looking for does not exist or may have been moved.",
+    "backToHome": "Back to Home"
+  }
+}

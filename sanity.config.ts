@@ -1,6 +1,7 @@
 import {defineConfig} from 'sanity'
 import {structureTool} from 'sanity/structure'
 import {visionTool} from '@sanity/vision'
+import {documentInternationalization} from '@sanity/document-internationalization'
 import {schemaTypes} from './sanity/schemas'
 
 /**
@@ -33,7 +34,18 @@ export default defineConfig({
 
   // プラグイン設定
   plugins: [
-    // 構造化ツール（日本語対応設定）
+    // 多言語対応プラグイン
+    documentInternationalization({
+      // 対応言語設定
+      supportedLanguages: [
+        {id: 'ja', title: '日本語'},
+        {id: 'en', title: 'English'}
+      ],
+      // 多言語対応するドキュメントタイプ
+      schemaTypes: ['blog', 'news', 'page']
+    }),
+
+    // 構造化ツール（多言語対応設定）
     structureTool({
       title: 'コンテンツ管理',
       name: 'content',

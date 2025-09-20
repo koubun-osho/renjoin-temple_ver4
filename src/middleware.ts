@@ -1,15 +1,18 @@
 /**
  * 蓮城院公式サイト - Next.js ミドルウェア
  *
- * セキュリティヘッダーとキャッシュ最適化（Next.js 15対応版）
+ * セキュリティヘッダー、キャッシュ最適化、多言語対応（Next.js 15対応版）
  *
  * @created 2025-09-18
- * @version 2.0.0 Next.js 15 Compatible版
- * @task P4-04 - パフォーマンス最適化
+ * @updated 2025-09-20
+ * @version 3.0.0 - i18n対応版
+ * @task P4-04 - パフォーマンス最適化 + 多言語対応
  */
 
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import createIntlMiddleware from 'next-intl/middleware'
+import { locales, defaultLocale } from './i18n'
 
 // ========================
 // セキュリティヘッダー設定
@@ -58,14 +61,54 @@ function getCacheControl(pathname: string): string {
 }
 
 // ========================
+// 国際化ミドルウェアの設定
+// ========================
+
+const intlMiddleware = createIntlMiddleware({
+  locales,
+  defaultLocale,
+  localePrefix: 'as-needed',
+  localeDetection: true
+})
+
+// ========================
 // メインミドルウェア関数
 // ========================
 
 export function middleware(request: NextRequest) {
-  const response = NextResponse.next()
+  const pathname = request.nextUrl.pathname
 
   try {
-    const pathname = request.nextUrl.pathname
+    // 静的ファイルやAPI以外のパスに対して国際化ミドルウェアを適用
+    if (
+      !pathname.startsWith('/_next') &&
+      !pathname.startsWith('/api') &&
+      !pathname.includes('.') &&
+      !pathname.startsWith('/favicon.ico')
+    ) {
+      // 国際化ミドルウェアを適用
+      const intlResponse = intlMiddleware(request)
+
+      if (intlResponse) {
+        // 国際化によるリダイレクトまたはレスポンスがある場合
+        // セキュリティヘッダーを追加
+        Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
+          intlResponse.headers.set(key, value)
+        })
+
+        // キャッシュコントロールを設定
+        const cacheControl = getCacheControl(pathname)
+        intlResponse.headers.set('Cache-Control', cacheControl)
+
+        // Vary ヘッダーを設定
+        intlResponse.headers.set('Vary', 'Accept-Encoding, Accept-Language')
+
+        return intlResponse
+      }
+    }
+
+    // 通常のレスポンス処理
+    const response = NextResponse.next()
 
     // セキュリティヘッダーを設定
     Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
@@ -76,13 +119,19 @@ export function middleware(request: NextRequest) {
     const cacheControl = getCacheControl(pathname)
     response.headers.set('Cache-Control', cacheControl)
 
-    // Vary ヘッダーを設定（圧縮対応）
-    response.headers.set('Vary', 'Accept-Encoding')
+    // Vary ヘッダーを設定（多言語対応）
+    response.headers.set('Vary', 'Accept-Encoding, Accept-Language')
 
     return response
 
   } catch (error) {
     console.error('Middleware error:', error)
+
+    // エラー時も基本的なセキュリティヘッダーは設定
+    const response = NextResponse.next()
+    Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
+      response.headers.set(key, value)
+    })
     return response
   }
 }
@@ -94,9 +143,10 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * 重要なページとAPIに限定してミドルウェアを適用
-     * Next.js 15対応のため、範囲を限定
+     * 国際化とセキュリティヘッダーを適用するパス
+     * Next.js 15 + next-intl対応
      */
-    '/((?!_next/static|_next/image|favicon.ico).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)',
+    '/(ja|en)/:path*'
   ],
 }

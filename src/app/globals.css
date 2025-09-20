@@ -249,6 +249,151 @@ body {
   -webkit-line-clamp: 3;
 }
 
+/* プリローダー用アニメーション */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes reverse-spin-slow {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
+.animate-reverse-spin-slow {
+  animation: reverse-spin-slow 6s linear infinite;
+}
+
+/* アニメーション遅延クラス */
+.animation-delay-150 {
+  animation-delay: 150ms;
+}
+
+.animation-delay-300 {
+  animation-delay: 300ms;
+}
+
+/* モーション設定の尊重 */
+@media (prefers-reduced-motion: reduce) {
+  .animate-spin-slow,
+  .animate-reverse-spin-slow,
+  .animate-bounce,
+  .animate-pulse {
+    animation: none;
+  }
+
+  .animate-fade-in,
+  .animate-fade-in-delay-1,
+  .animate-fade-in-delay-2,
+  .animate-fade-in-delay-3 {
+    animation: none;
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Phase 5-04: ヒーローセクション改善用のアニメーション */
+/* 縦書き表示の強化 */
+.vertical-writing-enhanced {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  font-feature-settings: "vpal" 1;
+}
+
+/* 青海波パターンのアニメーション */
+@keyframes wave-gentle {
+  0% {
+    transform: translateX(0) translateY(0);
+  }
+  50% {
+    transform: translateX(-5px) translateY(-2px);
+  }
+  100% {
+    transform: translateX(0) translateY(0);
+  }
+}
+
+.animate-wave-gentle {
+  animation: wave-gentle 20s ease-in-out infinite;
+}
+
+/* 穏やかなバウンスアニメーション */
+@keyframes gentle-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.animate-gentle-bounce {
+  animation: gentle-bounce 3s ease-in-out infinite;
+}
+
+/* 文字の一文字ずつフェードイン */
+@keyframes char-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-char-fade-in {
+  animation: char-fade-in 0.8s ease-out both;
+}
+
+/* 波紋エフェクト用のキーフレーム */
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.animate-ripple {
+  animation: ripple 2s ease-out infinite;
+}
+
+/* 文字列のタイムラグアニメーション用の遅延クラス */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+.delay-600 { animation-delay: 600ms; }
+.delay-700 { animation-delay: 700ms; }
+.delay-800 { animation-delay: 800ms; }
+.delay-900 { animation-delay: 900ms; }
+.delay-1000 { animation-delay: 1000ms; }
+
+/* パララックス効果のGPU最適化 */
+.parallax-element {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
 /* ダークモード対応（将来的な拡張用） */
 @media (prefers-color-scheme: dark) {
   :root {
@@ -258,5 +403,33 @@ body {
     --color-bg-primary: #1a202c;
     --color-bg-secondary: #2d3748;
     --color-bg-muted: #4a5568;
+  }
+}
+
+/* モーション設定の尊重（改善版） */
+@media (prefers-reduced-motion: reduce) {
+  .animate-spin-slow,
+  .animate-reverse-spin-slow,
+  .animate-bounce,
+  .animate-pulse,
+  .animate-wave-gentle,
+  .animate-gentle-bounce,
+  .animate-char-fade-in,
+  .animate-ripple {
+    animation: none;
+  }
+
+  .animate-fade-in,
+  .animate-fade-in-delay-1,
+  .animate-fade-in-delay-2,
+  .animate-fade-in-delay-3,
+  .animate-char-fade-in {
+    animation: none;
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  .parallax-element {
+    transform: none !important;
   }
 }

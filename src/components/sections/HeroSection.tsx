@@ -1,15 +1,19 @@
 /**
- * 蓮城院公式サイト - ヒーローセクション
+ * 蓮城院公式サイト - ヒーローセクション（Phase 5-04改良版）
  *
  * トップページのメインビジュアルセクション。
- * 境内写真を背景に縦書きキャッチコピーを配置した和モダンなデザイン。
+ * 境内写真を背景に美しい縦書き表示、詩的コンテンツ、
+ * パララックス効果、アニメーションを実装した格調高いデザイン。
  *
  * @created 2025-09-18
- * @version 1.0.0 MVP版
- * @task P3-03 - ヒーローセクション実装
+ * @updated 2025-09-20
+ * @version 2.0.0 Phase 5-04改良版
+ * @task P5-04 - ヒーローセクション改善実装
  */
 
-import { ReactNode } from 'react'
+'use client'
+
+import { ReactNode, useEffect, useState, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -25,8 +29,13 @@ interface HeroSectionProps {
   title?: string
   subtitle?: string
   description?: string
+  poeticContent?: {
+    japanese: string[]
+    english: string[]
+  }
   children?: ReactNode
   className?: string
+  language?: 'ja' | 'en'
 }
 
 // ========================
@@ -225,7 +234,148 @@ export const heroAnimationCSS = `
     animation: fade-in 1s ease-out 0.6s both;
   }
 
-  .animate-fade-in-delay-3 {
-    animation: fade-in 1s ease-out 0.9s both;
+  /* 縦書き表示の強化 */
+  .vertical-writing-enhanced {
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    font-feature-settings: "vpal" 1;
+  }
+
+  /* 青海波パターンのアニメーション */
+  @keyframes wave-gentle {
+    0% {
+      transform: translateX(0) translateY(0);
+    }
+    50% {
+      transform: translateX(-5px) translateY(-2px);
+    }
+    100% {
+      transform: translateX(0) translateY(0);
+    }
+  }
+
+  .animate-wave-gentle {
+    animation: wave-gentle 20s ease-in-out infinite;
+  }
+
+  /* 穏やかなバウンスアニメーション */
+  @keyframes gentle-bounce {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+
+  .animate-gentle-bounce {
+    animation: gentle-bounce 3s ease-in-out infinite;
+  }
+
+  /* 文字の一文字ずつフェードイン */
+  @keyframes char-fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px) scale(0.8);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .animate-char-fade-in {
+    animation: char-fade-in 0.8s ease-out both;
+  }
+
+  /* 波紋エフェクト用のキーフレーム */
+  @keyframes ripple {
+    0% {
+      transform: scale(0);
+      opacity: 0.8;
+    }
+    100% {
+      transform: scale(4);
+      opacity: 0;
+    }
+  }
+
+  .animate-ripple {
+    animation: ripple 2s ease-out infinite;
   }
 `
+
+// ========================
+// Vertical Writing Component
+// ========================
+
+interface VerticalTextProps {
+  children: string
+  className?: string
+  animated?: boolean
+  delay?: number
+}
+
+/**
+ * 縦書きテキスト専用コンポーネント
+ */
+export const VerticalText = ({
+  children,
+  className = '',
+  animated = false,
+  delay = 0
+}: VerticalTextProps) => {
+  const [isVisible, setIsVisible] = useState(!animated)
+
+  useEffect(() => {
+    if (animated) {
+      const timer = setTimeout(() => setIsVisible(true), delay)
+      return () => clearTimeout(timer)
+    }
+  }, [animated, delay])
+
+  return (
+    <div className={`vertical-writing-enhanced ${className} ${
+      animated ? (isVisible ? 'animate-char-fade-in' : 'opacity-0') : ''
+    }`}>
+      {children}
+    </div>
+  )
+}
+
+// ========================
+// Animated Character Component
+// ========================
+
+interface AnimatedCharactersProps {
+  text: string
+  className?: string
+  staggerDelay?: number
+  startDelay?: number
+}
+
+/**
+ * 文字を一文字ずつアニメーションするコンポーネント
+ */
+export const AnimatedCharacters = ({
+  text,
+  className = '',
+  staggerDelay = 100,
+  startDelay = 0
+}: AnimatedCharactersProps) => {
+  return (
+    <span className={className}>
+      {text.split('').map((char, index) => (
+        <span
+          key={index}
+          className="inline-block animate-char-fade-in"
+          style={{
+            animationDelay: `${startDelay + index * staggerDelay}ms`
+          }}
+        >
+          {char}
+        </span>
+      ))}
+    </span>
+  )
+}

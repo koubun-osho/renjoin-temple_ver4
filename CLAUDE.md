@@ -65,3 +65,30 @@ user-prompt-submit-hook: afplay /System/Library/Sounds/Pop.aiff
 - `Ping.aiff` - 静かで上品
 
 作業の完了を穏やかに知らせる音として適しています。
+
+# 作業記録ルール（2025-09-20追加）
+全ての技術作業において以下を厳守する：
+
+## 作業前の必須確認
+1. TodoWriteツールで作業計画を作成
+2. 現在の本番環境状況を確認・記録
+3. 影響範囲を事前評価
+
+## 作業中の記録義務
+1. 段階的実装と各段階でのテスト
+2. TodoWriteツールでの進捗更新
+3. 問題発生時の詳細記録
+
+## 作業完了時の確認
+1. 本番環境での動作確認実施
+2. 全機能テストの実行
+3. 作業内容をメモリに保存
+4. 影響のないことを明確に報告
+
+これらを怠った場合、予期しない本番環境への影響を引き起こす可能性があります。
+
+# important-instruction-reminders
+Do what has been asked; nothing more, nothing less.
+NEVER create files unless they're absolutely necessary for achieving your goal.
+ALWAYS prefer editing an existing file to creating a new one.
+NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.

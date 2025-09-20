@@ -1,0 +1,134 @@
+{
+  "navigation": {
+    "home": "ホーム",
+    "about": "寺院について",
+    "news": "お知らせ",
+    "blog": "ブログ",
+    "events": "行事・イベント",
+    "contact": "お問い合わせ",
+    "privacy": "プライバシーポリシー",
+    "terms": "利用規約"
+  },
+  "common": {
+    "loading": "読み込み中...",
+    "error": "エラーが発生しました",
+    "retry": "再試行",
+    "readMore": "続きを読む",
+    "backToTop": "トップに戻る",
+    "close": "閉じる",
+    "open": "開く",
+    "menu": "メニュー",
+    "search": "検索",
+    "submit": "送信",
+    "cancel": "キャンセル",
+    "confirm": "確認",
+    "yes": "はい",
+    "no": "いいえ",
+    "save": "保存",
+    "edit": "編集",
+    "delete": "削除",
+    "previous": "前へ",
+    "next": "次へ",
+    "share": "シェア",
+    "print": "印刷",
+    "download": "ダウンロード"
+  },
+  "hero": {
+    "title": "蓮城院へようこそ",
+    "subtitle": "心の安らぎと共に歩む",
+    "description": "静寂な空間で心を整え、日々の喧騒から離れて内なる平安を見つけてください。",
+    "exploreMore": "詳しく見る"
+  },
+  "about": {
+    "title": "蓮城院について",
+    "subtitle": "歴史と伝統を受け継ぐ",
+    "history": "歴史",
+    "teachings": "教え",
+    "facilities": "施設案内"
+  },
+  "news": {
+    "title": "お知らせ",
+    "subtitle": "最新の情報をお届けします",
+    "noNews": "現在、お知らせはありません",
+    "publishedOn": "公開日"
+  },
+  "blog": {
+    "title": "ブログ",
+    "subtitle": "日々の気づきと学び",
+    "noBlog": "現在、ブログ記事はありません",
+    "categories": "カテゴリー",
+    "tags": "タグ",
+    "relatedPosts": "関連記事"
+  },
+  "events": {
+    "title": "行事・イベント",
+    "subtitle": "共に歩む仏教行事",
+    "upcoming": "今後の行事",
+    "past": "過去の行事",
+    "noEvents": "現在、予定されている行事はありません",
+    "eventDate": "開催日",
+    "eventTime": "開催時間",
+    "eventLocation": "開催場所",
+    "eventDescription": "行事内容"
+  },
+  "contact": {
+    "title": "お問い合わせ",
+    "subtitle": "お気軽にご連絡ください",
+    "form": {
+      "name": "お名前",
+      "nameRequired": "お名前は必須です",
+      "email": "メールアドレス",
+      "emailRequired": "メールアドレスは必須です",
+      "emailInvalid": "有効なメールアドレスを入力してください",
+      "subject": "件名",
+      "subjectRequired": "件名は必須です",
+      "message": "メッセージ",
+      "messageRequired": "メッセージは必須です",
+      "submit": "送信する",
+      "submitting": "送信中...",
+      "success": "お問い合わせを受け付けました。ありがとうございます。",
+      "error": "送信に失敗しました。しばらく時間をおいて再度お試しください。"
+    },
+    "info": {
+      "address": "住所",
+      "phone": "電話番号",
+      "email": "メールアドレス",
+      "hours": "受付時間",
+      "access": "アクセス"
+    }
+  },
+  "footer": {
+    "copyright": "© 2025 蓮城院. All rights reserved.",
+    "links": {
+      "privacy": "プライバシーポリシー",
+      "terms": "利用規約",
+      "sitemap": "サイトマップ"
+    },
+    "social": {
+      "follow": "フォローする"
+    }
+  },
+  "language": {
+    "switchTo": "言語を切り替える",
+    "japanese": "日本語",
+    "english": "English"
+  },
+  "seo": {
+    "title": "蓮城院 - 心の安らぎと共に歩む",
+    "description": "蓮城院は心の平安と精神的な成長を求める方々のための寺院です。静寂な環境で瞑想や仏教の教えを学び、日々の喧騒から離れて内なる平和を見つけてください。",
+    "keywords": "蓮城院, 寺院, 仏教, 瞑想, 心の平安, 精神的成長, 仏教の教え"
+  },
+  "accessibility": {
+    "skipToContent": "コンテンツにスキップ",
+    "backToTop": "ページの先頭に戻る",
+    "openMenu": "メニューを開く",
+    "closeMenu": "メニューを閉じる",
+    "openModal": "モーダルを開く",
+    "closeModal": "モーダルを閉じる"
+  },
+  "notFound": {
+    "title": "ページが見つかりません",
+    "description": "お探しのページは存在しないか、移動された可能性があります。",
+    "backToHome": "ホームに戻る"
+  }
+}

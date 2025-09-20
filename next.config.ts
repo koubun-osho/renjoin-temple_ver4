@@ -1,7 +1,11 @@
 import type { NextConfig } from "next";
+import createNextIntlPlugin from 'next-intl/plugin'
 
 // Bundle Analyzerのインポート
 import bundleAnalyzer from '@next/bundle-analyzer'
+
+// next-intlプラグインの設定
+const withNextIntl = createNextIntlPlugin('./src/i18n.ts')
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
@@ -9,14 +13,15 @@ const withBundleAnalyzer = bundleAnalyzer({
 })
 
 /**
- * 蓮城院公式サイト - セキュリティ強化 Next.js設定
+ * 蓮城院公式サイト - セキュリティ強化 + 多言語対応 Next.js設定
  *
  * 要件定義書.md section 3.1 セキュリティ要件に準拠
  * - XSS攻撃の防止
  * - 適切なContent Security Policy
  * - セキュリティヘッダーの設定
+ * - next-intl多言語対応
  *
- * @version 2.0.0 セキュリティ強化版
+ * @version 3.0.0 多言語対応版
  */
 
 const nextConfig: NextConfig = {
@@ -26,6 +31,18 @@ const nextConfig: NextConfig = {
 
   // 静的ファイルの最適化
   assetPrefix: process.env.NODE_ENV === 'production' ? undefined : undefined,
+
+  // リダイレクト設定（多言語対応）
+  async redirects() {
+    return [
+      // ルートパスから日本語へのリダイレクト
+      {
+        source: '/',
+        destination: '/ja',
+        permanent: false,
+      },
+    ]
+  },
   // セキュリティヘッダーの設定
   async headers() {
     return [
@@ -217,5 +234,5 @@ const nextConfig: NextConfig = {
   }
 };
 
-// Bundle Analyzerでラップしてエクスポート
-export default withBundleAnalyzer(nextConfig);
+// プラグインを適用してエクスポート
+export default withNextIntl(withBundleAnalyzer(nextConfig));
