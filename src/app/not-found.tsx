@@ -2,27 +2,13 @@
  * 蓮城院公式サイト - グローバル404ページ
  *
  * ルートレベルのnot-foundページ（多言語対応）
- * Next.js Linkコンポーネントを使用
+ * aタグを使用した直接リンク
  *
  * @created 2025-09-20
- * @version 1.3.0 - 修正版（正しいNext.js統合）
+ * @version 1.5.0 - aタグ直接版
  */
 
-'use client'
-
-import { useRouter } from 'next/navigation'
-
 export default function GlobalNotFound() {
-  const router = useRouter()
-
-  const handleJapanese = () => {
-    router.push('/ja')
-  }
-
-  const handleEnglish = () => {
-    router.push('/en')
-  }
-
   return (
     <div
       style={{
@@ -81,8 +67,8 @@ export default function GlobalNotFound() {
             gap: '1rem'
           }}
         >
-          <button
-            onClick={handleJapanese}
+          <a
+            href="/ja"
             style={{
               background: '#1e40af',
               color: 'white',
@@ -92,6 +78,9 @@ export default function GlobalNotFound() {
               fontSize: '16px',
               fontWeight: '500',
               cursor: 'pointer',
+              textDecoration: 'none',
+              display: 'block',
+              textAlign: 'center',
               transition: 'background-color 0.2s ease'
             }}
             onMouseEnter={(e) => {
@@ -102,9 +91,9 @@ export default function GlobalNotFound() {
             }}
           >
             日本語サイトへ
-          </button>
-          <button
-            onClick={handleEnglish}
+          </a>
+          <a
+            href="/en"
             style={{
               background: '#1e40af',
               color: 'white',
@@ -114,6 +103,9 @@ export default function GlobalNotFound() {
               fontSize: '16px',
               fontWeight: '500',
               cursor: 'pointer',
+              textDecoration: 'none',
+              display: 'block',
+              textAlign: 'center',
               transition: 'background-color 0.2s ease'
             }}
             onMouseEnter={(e) => {
@@ -124,7 +116,7 @@ export default function GlobalNotFound() {
             }}
           >
             English Site
-          </button>
+          </a>
         </div>
       </div>
     </div>
